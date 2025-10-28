@@ -1,7 +1,13 @@
-import { Settings, Plus, Upload } from 'lucide-react';
+import { Settings, Plus, Upload, MoreVertical, Copy, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { useBookmarks } from '@/contexts/BookmarkContext';
 import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu';
 
 interface SidebarProps {
   onOpenSettings: () => void;
@@ -9,7 +15,7 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ onOpenSettings, onOpenImport }: SidebarProps) => {
-  const { lists, currentList, createNewList, selectList, deleteList } = useBookmarks();
+  const { lists, currentList, createNewList, selectList, deleteList, duplicateList } = useBookmarks();
 
   return (
     <div className="w-full h-full bg-sidebar text-sidebar-foreground flex flex-col">
@@ -49,14 +55,43 @@ export const Sidebar = ({ onOpenSettings, onOpenImport }: SidebarProps) => {
               <div
                 key={list.id}
                 className={cn(
-                  "group flex items-center justify-between px-2 py-1.5 rounded-md cursor-pointer transition-colors",
+                  "group flex items-center justify-between px-2 py-1.5 rounded-md transition-colors",
                   currentList?.id === list.id
                     ? "bg-sidebar-accent text-sidebar-accent-foreground"
                     : "hover:bg-sidebar-accent/50 text-sidebar-foreground"
                 )}
-                onClick={() => selectList(list.id)}
               >
-                <span className="truncate text-sm">{list.topLevelName}</span>
+                <span 
+                  className="truncate text-sm flex-1 cursor-pointer" 
+                  onClick={() => selectList(list.id)}
+                >
+                  {list.topLevelName}
+                </span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreVertical className="h-3 w-3" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={() => duplicateList(list.id)}>
+                      <Copy className="h-4 w-4 mr-2" />
+                      Duplicate
+                    </DropdownMenuItem>
+                    <DropdownMenuItem 
+                      onClick={() => deleteList(list.id)}
+                      className="text-destructive focus:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             ))}
           </div>

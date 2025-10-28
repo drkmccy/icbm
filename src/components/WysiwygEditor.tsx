@@ -5,12 +5,37 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
+import { ChevronRight, ChevronDown, Trash2 } from 'lucide-react';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 
 export const WysiwygEditor = () => {
-  const { currentList, updateList, addToHistory } = useBookmarks();
+  const { currentList, updateList, addToHistory, undo, redo } = useBookmarks();
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   useEffect(() => {
     if (editingName && inputRef.current) {
@@ -18,6 +43,24 @@ export const WysiwygEditor = () => {
       inputRef.current.select();
     }
   }, [editingName]);
+
+  // Keyboard shortcuts for undo/redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.shiftKey && e.key === 'Z') {
+          e.preventDefault();
+          redo();
+        } else if (e.key === 'z') {
+          e.preventDefault();
+          undo();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [undo, redo]);
 
   if (!currentList) {
     return (
@@ -160,121 +203,223 @@ export const WysiwygEditor = () => {
     updateList(updatedList);
   };
 
-  const renderItem = (item: BookmarkItem, path: number[], depth: number = 0) => {
-    if (item.type === 'folder') {
-      const folder = item as BookmarkFolder;
-      const isCollapsed = folder.collapsed || false;
-      
-      return (
-        <div key={item.id} className="group">
-          <div 
-            className={cn(
-              "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
-              focusedId === item.id && "bg-muted"
-            )}
-            style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
-          >
-            <button
-              onClick={() => toggleCollapse(path)}
-              className="text-sm flex items-center justify-center w-4 h-4"
-            >
-              {isCollapsed ? '˃' : '˅'}
-            </button>
-            <span className="text-lg cursor-pointer" onClick={() => setFocusedId(item.id)}>
-              {isCollapsed ? '📁' : '📂'}
-            </span>
-            <Input
-              value={folder.name}
-              onChange={(e) => updateItemName(path, e.target.value)}
-              onFocus={() => setFocusedId(item.id)}
-              className="flex-1 h-7 bg-transparent border-none focus:bg-background"
-            />
-            {!isCollapsed && (
-              <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => sortFolder(path)}
-                  className="h-6 w-6 p-0"
-                  title="Sort"
-                >
-                  ↕️
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => addFolder(path)}
-                  className="h-6 w-6 p-0"
-                  title="Add Subfolder"
-                >
-                  📂
-                </Button>
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => addLink(path)}
-                  className="h-6 w-6 p-0"
-                  title="Add Link"
-                >
-                  🔖
-                </Button>
-              </div>
-            )}
-            <Button
-              size="sm"
-              variant="ghost"
-              onClick={() => deleteItem(path)}
-              className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-            >
-              ❌
-            </Button>
-          </div>
-          {!isCollapsed && folder.children.map((child, idx) => 
-            renderItem(child, [...path, idx], depth + 1)
-          )}
-        </div>
-      );
+  const handleDragEnd = (event: DragEndEvent, parentPath: number[]) => {
+    const { active, over } = event;
+    
+    if (!over || active.id === over.id) return;
+
+    const updatedList = { ...currentList };
+    let items: BookmarkItem[];
+    
+    if (parentPath.length === 0) {
+      items = updatedList.children;
     } else {
-      const link = item as BookmarkLink;
+      let current: any = updatedList;
+      for (let i = 0; i < parentPath.length - 1; i++) {
+        current = current.children[parentPath[i]];
+      }
+      const folder = current.children[parentPath[parentPath.length - 1]] as BookmarkFolder;
+      items = folder.children;
+    }
+
+    const oldIndex = items.findIndex(item => item.id === active.id);
+    const newIndex = items.findIndex(item => item.id === over.id);
+
+    if (oldIndex !== -1 && newIndex !== -1) {
+      const newItems = arrayMove(items, oldIndex, newIndex);
       
-      return (
-        <div
-          key={item.id}
+      if (parentPath.length === 0) {
+        updatedList.children = newItems;
+      } else {
+        let current: any = updatedList;
+        for (let i = 0; i < parentPath.length - 1; i++) {
+          current = current.children[parentPath[i]];
+        }
+        const folder = current.children[parentPath[parentPath.length - 1]] as BookmarkFolder;
+        folder.children = newItems;
+      }
+      
+      addToHistory(updatedList.children);
+      updateList(updatedList);
+    }
+  };
+
+  const SortableItem = ({ 
+    item, 
+    path, 
+    depth 
+  }: { 
+    item: BookmarkItem; 
+    path: number[]; 
+    depth: number;
+  }) => {
+    const {
+      attributes,
+      listeners,
+      setNodeRef,
+      transform,
+      transition,
+    } = useSortable({ id: item.id });
+
+    const style = {
+      transform: CSS.Transform.toString(transform),
+      transition,
+    };
+
+    return (
+      <div ref={setNodeRef} style={style} {...attributes}>
+        {item.type === 'folder' ? 
+          renderFolder(item as BookmarkFolder, path, depth, listeners) : 
+          renderLink(item as BookmarkLink, path, depth, listeners)
+        }
+      </div>
+    );
+  };
+
+  const renderFolder = (
+    folder: BookmarkFolder, 
+    path: number[], 
+    depth: number, 
+    dragHandlers?: any
+  ) => {
+    const isCollapsed = folder.collapsed || false;
+    
+    return (
+      <div className="group">
+        <div 
           className={cn(
-            "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
-            focusedId === item.id && "bg-muted"
+            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 cursor-move",
+            focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
+          {...dragHandlers}
         >
-          <span className="text-lg ml-4 cursor-pointer" onClick={() => setFocusedId(item.id)}>
-            🔖
+          <button
+            onClick={() => toggleCollapse(path)}
+            className="text-sm flex items-center justify-center w-4 h-4"
+          >
+            {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+          </button>
+          <span className="text-lg cursor-pointer" onClick={() => setFocusedId(folder.id)}>
+            {isCollapsed ? '📁' : '📂'}
           </span>
           <Input
-            value={link.name}
+            value={folder.name}
             onChange={(e) => updateItemName(path, e.target.value)}
-            onFocus={() => setFocusedId(item.id)}
-            placeholder="Name"
-            className="flex-1 h-7 bg-transparent border-none focus:bg-background rounded-full"
+            onFocus={() => setFocusedId(folder.id)}
+            className="flex-1 h-7 bg-transparent border-none focus:bg-background"
           />
-          <Input
-            value={link.url}
-            onChange={(e) => updateLinkUrl(path, e.target.value)}
-            onFocus={() => setFocusedId(item.id)}
-            placeholder="URL"
-            className="flex-1 h-7 bg-transparent border-none focus:bg-background rounded-full"
-          />
+          {!isCollapsed && (
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => sortFolder(path)}
+                className="h-6 w-6 p-0"
+                title="Sort"
+              >
+                ↕️
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => addFolder(path)}
+                className="h-6 w-6 p-0"
+                title="Add Subfolder"
+              >
+                📂
+              </Button>
+              <Button
+                size="sm"
+                variant="ghost"
+                onClick={() => addLink(path)}
+                className="h-6 w-6 p-0"
+                title="Add Link"
+              >
+                🔖
+              </Button>
+            </div>
+          )}
           <Button
             size="sm"
             variant="ghost"
             onClick={() => deleteItem(path)}
             className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Delete"
           >
-            ❌
+            <Trash2 className="h-4 w-4" />
           </Button>
         </div>
-      );
-    }
+        {!isCollapsed && folder.children.length > 0 && (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={(event) => handleDragEnd(event, path)}
+          >
+            <SortableContext
+              items={folder.children.map(c => c.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              {folder.children.map((child, idx) => (
+                <SortableItem
+                  key={child.id}
+                  item={child}
+                  path={[...path, idx]}
+                  depth={depth + 1}
+                />
+              ))}
+            </SortableContext>
+          </DndContext>
+        )}
+      </div>
+    );
   };
+
+  const renderLink = (
+    link: BookmarkLink, 
+    path: number[], 
+    depth: number,
+    dragHandlers?: any
+  ) => {
+    return (
+      <div
+        className={cn(
+          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 cursor-move",
+          focusedId === link.id && "bg-muted"
+        )}
+        style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
+        {...dragHandlers}
+      >
+        <span className="text-lg ml-4 cursor-pointer" onClick={() => setFocusedId(link.id)}>
+          🔖
+        </span>
+        <Input
+          value={link.name}
+          onChange={(e) => updateItemName(path, e.target.value)}
+          onFocus={() => setFocusedId(link.id)}
+          placeholder="Name"
+          className="w-[30%] h-7 bg-transparent border-none focus:bg-background rounded-full"
+        />
+        <Input
+          value={link.url}
+          onChange={(e) => updateLinkUrl(path, e.target.value)}
+          onFocus={() => setFocusedId(link.id)}
+          placeholder="URL"
+          className="w-[70%] h-7 bg-transparent border-none focus:bg-background rounded-full"
+        />
+        <Button
+          size="sm"
+          variant="ghost"
+          onClick={() => deleteItem(path)}
+          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          title="Delete"
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
+
 
   return (
     <div className="h-full overflow-y-auto bg-editor p-4">
@@ -322,7 +467,25 @@ export const WysiwygEditor = () => {
         </div>
 
         {/* Children */}
-        {currentList.children.map((child, idx) => renderItem(child, [idx]))}
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={(event) => handleDragEnd(event, [])}
+        >
+          <SortableContext
+            items={currentList.children.map(c => c.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            {currentList.children.map((child, idx) => (
+              <SortableItem
+                key={child.id}
+                item={child}
+                path={[idx]}
+                depth={0}
+              />
+            ))}
+          </SortableContext>
+        </DndContext>
       </div>
     </div>
   );

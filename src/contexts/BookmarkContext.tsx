@@ -16,6 +16,7 @@ interface BookmarkContextType {
   selectList: (id: string) => void;
   updateList: (list: BookmarkList) => void;
   deleteList: (id: string) => void;
+  duplicateList: (id: string) => void;
   importList: (data: any, format: ExportFormat, filename?: string) => void;
   setExportFormat: (format: ExportFormat) => void;
   setTheme: (theme: 'light' | 'dark') => void;
@@ -143,6 +144,25 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [currentList]);
 
+  const duplicateList = useCallback((id: string) => {
+    const listToDuplicate = lists.find(l => l.id === id);
+    if (!listToDuplicate) return;
+
+    const duplicatedList: BookmarkList = {
+      id: uuidv4(),
+      topLevelName: `${listToDuplicate.topLevelName} (Copy)`,
+      children: JSON.parse(JSON.stringify(listToDuplicate.children)),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    };
+
+    setLists(prev => [...prev, duplicatedList]);
+    setCurrentList(duplicatedList);
+    setExportFormat(defaultFormat);
+    setHistory([duplicatedList.children]);
+    setHistoryIndex(0);
+  }, [lists, defaultFormat]);
+
   const importList = useCallback((data: any, format: ExportFormat, filename?: string) => {
     // Implementation for importing different formats
     const newList: BookmarkList = {
@@ -197,6 +217,7 @@ export const BookmarkProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         selectList,
         updateList,
         deleteList,
+        duplicateList,
         importList,
         setExportFormat,
         setTheme,

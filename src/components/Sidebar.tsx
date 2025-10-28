@@ -20,8 +20,8 @@ export const Sidebar = ({ onOpenSettings, onOpenImport }: SidebarProps) => {
   return (
     <div className="w-full h-full bg-sidebar text-sidebar-foreground flex flex-col">
       <div className="p-4 border-b border-sidebar-border">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          🗄️Filink
+        <h1 className="text-2xl font-bold font-display text-sidebar-foreground">
+          I.C.B.M.
         </h1>
       </div>
 
@@ -105,7 +105,7 @@ export const Sidebar = ({ onOpenSettings, onOpenImport }: SidebarProps) => {
           onClick={onOpenSettings}
         >
           <Settings className="h-4 w-4" />
-          ⚙️Settings
+          Settings
         </Button>
         
         <a

@@ -3,6 +3,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useBookmarks } from '@/contexts/BookmarkContext';
 import { ExportFormat } from '@/types/bookmark';
+import { Settings } from 'lucide-react';
 
 interface SettingsModalProps {
   open: boolean;
@@ -16,7 +17,10 @@ export const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>⚙️ Settings</DialogTitle>
+          <DialogTitle className="flex items-center gap-2">
+            <Settings className="h-5 w-5" />
+            Settings
+          </DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6 py-4">

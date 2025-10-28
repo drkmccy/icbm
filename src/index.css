@@ -48,7 +48,18 @@ All colors MUST be HSL.
     --sidebar-ring: 38 95% 62%;
     
     --editor-background: 210 15% 96%;
-    --code-background: 215 20% 15%;
+    
+    /* Dracula Theme Colors for Code Editor */
+    --code-background: 231 15% 18%;
+    --code-foreground: 60 30% 96%;
+    --code-comment: 225 27% 51%;
+    --code-red: 0 100% 67%;
+    --code-orange: 31 100% 71%;
+    --code-yellow: 65 92% 76%;
+    --code-green: 135 94% 65%;
+    --code-cyan: 191 97% 77%;
+    --code-purple: 265 89% 78%;
+    --code-pink: 326 100% 74%;
   }
 
   .dark {
@@ -90,7 +101,18 @@ All colors MUST be HSL.
     --sidebar-ring: 38 95% 62%;
     
     --editor-background: 215 25% 14%;
-    --code-background: 215 25% 10%;
+    
+    /* Dracula Theme Colors for Code Editor (same for dark) */
+    --code-background: 231 15% 18%;
+    --code-foreground: 60 30% 96%;
+    --code-comment: 225 27% 51%;
+    --code-red: 0 100% 67%;
+    --code-orange: 31 100% 71%;
+    --code-yellow: 65 92% 76%;
+    --code-green: 135 94% 65%;
+    --code-cyan: 191 97% 77%;
+    --code-purple: 265 89% 78%;
+    --code-pink: 326 100% 74%;
   }
 }
 

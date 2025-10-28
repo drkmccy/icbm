@@ -13,6 +13,11 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['DM Sans', 'sans-serif'],
+        mono: ['DM Mono', 'monospace'],
+        display: ['Black Ops One', 'cursive'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -62,6 +67,15 @@ export default {
         },
         code: {
           DEFAULT: "hsl(var(--code-background))",
+          foreground: "hsl(var(--code-foreground))",
+          comment: "hsl(var(--code-comment))",
+          red: "hsl(var(--code-red))",
+          orange: "hsl(var(--code-orange))",
+          yellow: "hsl(var(--code-yellow))",
+          green: "hsl(var(--code-green))",
+          cyan: "hsl(var(--code-cyan))",
+          purple: "hsl(var(--code-purple))",
+          pink: "hsl(var(--code-pink))",
         },
       },
       borderRadius: {

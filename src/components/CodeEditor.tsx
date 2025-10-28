@@ -108,8 +108,51 @@ export const CodeEditor = () => {
     );
   }
 
+  const highlightCode = (code: string, format: ExportFormat): string => {
+    const escapeHtml = (str: string) => 
+      str.replace(/&/g, '&amp;')
+         .replace(/</g, '&lt;')
+         .replace(/>/g, '&gt;')
+         .replace(/"/g, '&quot;')
+         .replace(/'/g, '&#039;');
+    
+    let highlighted = escapeHtml(code);
+    
+    if (format === 'json') {
+      // Highlight JSON
+      highlighted = highlighted
+        .replace(/(".*?")\s*:/g, '<span style="color: hsl(var(--code-cyan))">$1</span>:')
+        .replace(/:\s*(".*?")/g, ': <span style="color: hsl(var(--code-green))">$1</span>')
+        .replace(/:\s*(\d+)/g, ': <span style="color: hsl(var(--code-purple))">$1</span>')
+        .replace(/:\s*(true|false|null)/g, ': <span style="color: hsl(var(--code-purple))">$1</span>');
+    } else if (format === 'html') {
+      // Highlight HTML
+      highlighted = highlighted
+        .replace(/&lt;(\/?[\w-]+)/g, '&lt;<span style="color: hsl(var(--code-pink))">$1</span>')
+        .replace(/([\w-]+)=/g, '<span style="color: hsl(var(--code-green))">$1</span>=')
+        .replace(/=(&quot;.*?&quot;)/g, '=<span style="color: hsl(var(--code-yellow))">$1</span>')
+        .replace(/&gt;/g, '<span style="color: hsl(var(--code-pink))">&gt;</span>');
+    } else if (format === 'plist') {
+      // Highlight Plist (XML-based)
+      highlighted = highlighted
+        .replace(/&lt;(\/?[\w-]+)/g, '&lt;<span style="color: hsl(var(--code-pink))">$1</span>')
+        .replace(/&gt;/g, '<span style="color: hsl(var(--code-pink))">&gt;</span>')
+        .replace(/&lt;(key|string|array|dict)&gt;(.*?)&lt;\/(key|string|array|dict)&gt;/g, 
+          (match, tag1, content, tag2) => {
+            const coloredTag1 = `&lt;<span style="color: hsl(var(--code-pink))">${tag1}</span>&gt;`;
+            const coloredTag2 = `&lt;/<span style="color: hsl(var(--code-pink))">${tag2}</span>&gt;`;
+            const coloredContent = tag1 === 'key' 
+              ? `<span style="color: hsl(var(--code-cyan))">${content}</span>`
+              : `<span style="color: hsl(var(--code-green))">${content}</span>`;
+            return `${coloredTag1}${coloredContent}${coloredTag2}`;
+          });
+    }
+    
+    return highlighted;
+  };
+
   return (
-    <div className="h-full flex flex-col bg-code">
+    <div className="h-full flex flex-col bg-code relative">
       <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
         <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as ExportFormat)}>
           <SelectTrigger className="w-32">
@@ -134,13 +177,21 @@ export const CodeEditor = () => {
         </div>
       </div>
       
+      <div className="flex-1 overflow-auto bg-code">
+        <pre className="p-4 text-sm font-mono">
+          <code 
+            dangerouslySetInnerHTML={{ __html: highlightCode(code, exportFormat) }}
+            className={`block ${!isValidCode ? 'border-2 border-destructive' : ''}`}
+          />
+        </pre>
+      </div>
+      
       <textarea
         value={code}
         onChange={(e) => handleCodeChange(e.target.value)}
-        className={`flex-1 w-full p-4 font-mono text-sm bg-code text-foreground resize-none focus:outline-none ${
-          !isValidCode ? 'border-2 border-destructive' : ''
-        }`}
+        className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-code-foreground resize-none focus:outline-none caret-code-foreground opacity-0 focus:opacity-100"
         spellCheck={false}
+        style={{ caretColor: 'hsl(var(--code-foreground))' }}
       />
       
       {!isValidCode && (

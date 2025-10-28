@@ -5,7 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
-import { ChevronRight, ChevronDown, Trash2 } from 'lucide-react';
+import { ChevronRight, ChevronDown, Trash2, GripVertical } from 'lucide-react';
 import {
   DndContext,
   closestCenter,
@@ -288,12 +288,14 @@ export const WysiwygEditor = () => {
       <div className="group">
         <div 
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 cursor-move",
+            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
             focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
-          {...dragHandlers}
         >
+          <div {...dragHandlers} className="cursor-move touch-none">
+            <GripVertical className="h-4 w-4 text-muted-foreground" />
+          </div>
           <button
             onClick={() => toggleCollapse(path)}
             className="text-sm flex items-center justify-center w-4 h-4"
@@ -384,13 +386,15 @@ export const WysiwygEditor = () => {
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 cursor-move",
+          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
           focusedId === link.id && "bg-muted"
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
-        {...dragHandlers}
       >
-        <span className="text-lg ml-4 cursor-pointer" onClick={() => setFocusedId(link.id)}>
+        <div {...dragHandlers} className="cursor-move touch-none">
+          <GripVertical className="h-4 w-4 text-muted-foreground" />
+        </div>
+        <span className="text-lg cursor-pointer" onClick={() => setFocusedId(link.id)}>
           🔖
         </span>
         <Input

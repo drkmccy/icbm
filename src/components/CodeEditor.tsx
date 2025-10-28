@@ -152,8 +152,8 @@ export const CodeEditor = () => {
   };
 
   return (
-    <div className="h-full flex flex-col bg-code relative">
-      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card">
+    <div className="h-full flex flex-col bg-code">
+      <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-card z-10 relative">
         <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as ExportFormat)}>
           <SelectTrigger className="w-32">
             <SelectValue />
@@ -177,22 +177,22 @@ export const CodeEditor = () => {
         </div>
       </div>
       
-      <div className="flex-1 overflow-auto bg-code">
+      <div className="flex-1 overflow-auto bg-code relative">
         <pre className="p-4 text-sm font-mono">
           <code 
             dangerouslySetInnerHTML={{ __html: highlightCode(code, exportFormat) }}
-            className={`block ${!isValidCode ? 'border-2 border-destructive' : ''}`}
+            className={`block text-code-foreground ${!isValidCode ? 'border-2 border-destructive' : ''}`}
           />
         </pre>
+        
+        <textarea
+          value={code}
+          onChange={(e) => handleCodeChange(e.target.value)}
+          className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-code-foreground resize-none focus:outline-none caret-code-foreground opacity-0 focus:opacity-100"
+          spellCheck={false}
+          style={{ caretColor: 'hsl(var(--code-foreground))' }}
+        />
       </div>
-      
-      <textarea
-        value={code}
-        onChange={(e) => handleCodeChange(e.target.value)}
-        className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-code-foreground resize-none focus:outline-none caret-code-foreground opacity-0 focus:opacity-100"
-        spellCheck={false}
-        style={{ caretColor: 'hsl(var(--code-foreground))' }}
-      />
       
       {!isValidCode && (
         <div className="px-4 py-2 bg-destructive/10 text-destructive text-sm">

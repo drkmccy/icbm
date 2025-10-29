@@ -121,9 +121,9 @@ export const CodeEditor = () => {
     if (format === 'json') {
       // Highlight JSON
       highlighted = highlighted
-        .replace(/(".*?")\s*:/g, '<span class="syntax-cyan">$1</span>:')
+        .replace(/(".*?")\s*:/g, '<span class="syntax-purple">$1</span>:')
         .replace(/:\s*(".*?")/g, ': <span class="syntax-green">$1</span>')
-        .replace(/:\s*(\d+)/g, ': <span class="syntax-purple">$1</span>')
+        .replace(/:\s*(\d+)/g, ': <span class="syntax-orange">$1</span>')
         .replace(/:\s*(true|false|null)/g, ': <span class="syntax-purple">$1</span>');
     } else if (format === 'html') {
       // Highlight HTML
@@ -188,7 +188,7 @@ export const CodeEditor = () => {
         <textarea
           value={code}
           onChange={(e) => handleCodeChange(e.target.value)}
-          className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-transparent resize-none focus:outline-none caret-code-foreground opacity-100"
+          className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-transparent resize-none focus:outline-none caret-code-foreground overflow-hidden"
           spellCheck={false}
           style={{ caretColor: 'hsl(var(--code-foreground))' }}
         />

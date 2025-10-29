@@ -119,19 +119,18 @@ export const CodeEditor = () => {
     let highlighted = escapeHtml(code);
     
     if (format === 'json') {
-      // Highlight JSON
+      // Highlight JSON: keys=purple, strings=green, numbers=orange, booleans/null=purple
       highlighted = highlighted
-        .replace(/(".*?")\s*:/g, '<span class="syntax-purple">$1</span>:')
-        .replace(/:\s*(".*?")/g, ': <span class="syntax-green">$1</span>')
-        .replace(/:\s*(\d+)/g, ': <span class="syntax-orange">$1</span>')
+        .replace(/("(?:[^"\\]|\\.)*?")\s*:/g, '<span class="syntax-purple">$1</span>:')
+        .replace(/:\s*("(?:[^"\\]|\\.)*?")/g, ': <span class="syntax-green">$1</span>')
+        .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="syntax-orange">$1</span>')
         .replace(/:\s*(true|false|null)/g, ': <span class="syntax-purple">$1</span>');
     } else if (format === 'html') {
-      // Highlight HTML
+      // Highlight HTML: tags=pink, attributes=cyan, values=green
       highlighted = highlighted
-        .replace(/&lt;(\/?[\w-]+)/g, '&lt;<span class="syntax-pink">$1</span>')
-        .replace(/([\w-]+)=/g, '<span class="syntax-green">$1</span>=')
-        .replace(/=(&quot;.*?&quot;)/g, '=<span class="syntax-yellow">$1</span>')
-        .replace(/&gt;/g, '<span class="syntax-pink">&gt;</span>');
+        .replace(/(&lt;\/?)([\w-]+)(\s|&gt;)/g, '$1<span class="syntax-pink">$2</span>$3')
+        .replace(/([\w-]+)=(&quot;)/g, '<span class="syntax-cyan">$1</span>=$2')
+        .replace(/=(&quot;)((?:[^&]|&(?!quot;))*?)(&quot;)/g, '=<span class="syntax-green">$1$2$3</span>');
     } else if (format === 'plist') {
       // Highlight Plist (XML-based)
       highlighted = highlighted

@@ -293,26 +293,26 @@ export const WysiwygEditor = () => {
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
         >
-          <div {...dragHandlers} className="cursor-move touch-none">
+          <div {...dragHandlers} className="cursor-move touch-none flex-shrink-0">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
           <button
             onClick={() => toggleCollapse(path)}
-            className="text-sm flex items-center justify-center w-4 h-4"
+            className="text-sm flex items-center justify-center w-4 h-4 flex-shrink-0"
           >
             {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           </button>
-          <span className="text-lg cursor-pointer" onClick={() => setFocusedId(folder.id)}>
+          <span className="text-lg cursor-pointer flex-shrink-0" onClick={() => setFocusedId(folder.id)}>
             {isCollapsed ? '📁' : '📂'}
           </span>
           <Input
             value={folder.name}
             onChange={(e) => updateItemName(path, e.target.value)}
             onFocus={() => setFocusedId(folder.id)}
-            className="flex-1 h-7 bg-transparent border-none focus:bg-background"
+            className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           {!isCollapsed && (
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
               <Button
                 size="sm"
                 variant="ghost"
@@ -346,7 +346,7 @@ export const WysiwygEditor = () => {
             size="sm"
             variant="ghost"
             onClick={() => deleteItem(path)}
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
             title="Delete"
           >
             <Trash2 className="h-4 w-4" />
@@ -391,10 +391,10 @@ export const WysiwygEditor = () => {
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
       >
-        <div {...dragHandlers} className="cursor-move touch-none">
+        <div {...dragHandlers} className="cursor-move touch-none flex-shrink-0">
           <GripVertical className="h-4 w-4 text-muted-foreground" />
         </div>
-        <span className="text-lg cursor-pointer" onClick={() => setFocusedId(link.id)}>
+        <span className="text-lg cursor-pointer flex-shrink-0" onClick={() => setFocusedId(link.id)}>
           🔖
         </span>
         <Input
@@ -402,20 +402,20 @@ export const WysiwygEditor = () => {
           onChange={(e) => updateItemName(path, e.target.value)}
           onFocus={() => setFocusedId(link.id)}
           placeholder="Name"
-          className="w-[30%] h-7 bg-transparent border-none focus:bg-background rounded-full"
+          className="w-[30%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Input
           value={link.url}
           onChange={(e) => updateLinkUrl(path, e.target.value)}
           onFocus={() => setFocusedId(link.id)}
           placeholder="URL"
-          className="w-[70%] h-7 bg-transparent border-none focus:bg-background rounded-full"
+          className="w-[70%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Button
           size="sm"
           variant="ghost"
           onClick={() => deleteItem(path)}
-          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
           title="Delete"
         >
           <Trash2 className="h-4 w-4" />

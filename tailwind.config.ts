@@ -69,6 +69,7 @@ export default {
           DEFAULT: "hsl(var(--code-background))",
           foreground: "hsl(var(--code-foreground))",
           comment: "hsl(var(--code-comment))",
+          selection: "hsl(var(--code-selection))",
           red: "hsl(var(--code-red))",
           orange: "hsl(var(--code-orange))",
           yellow: "hsl(var(--code-yellow))",

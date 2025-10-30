@@ -310,15 +310,10 @@ export const WysiwygEditor = () => {
       <div className="group">
         <div
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
+            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
             focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
-          onClick={(e) => {
-            const target = e.target as HTMLElement;
-            if (target.closest('[data-row-action="true"]')) return;
-            nameInputRef.current?.focus();
-          }}
         >
           <div {...dragHandlers} data-row-action="true" className="cursor-move touch-none flex-shrink-0">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -346,10 +341,10 @@ export const WysiwygEditor = () => {
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
             autoFocus={focusedId === folder.id}
-            className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
+            className="flex-1 min-w-0 max-w-[50%] h-7 bg-transparent border-none focus:bg-background truncate"
           />
           {!isCollapsed && (
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-none basis-[112px] justify-end">
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 w-[112px] justify-end">
               <Button
                 size="sm"
                 variant="ghost"
@@ -440,15 +435,10 @@ export const WysiwygEditor = () => {
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
+          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
           focusedId === link.id && "bg-muted"
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
-        onClick={(e) => {
-          const target = e.target as HTMLElement;
-          if (target.closest('[data-row-action="true"]')) return;
-          nameInputRef.current?.focus();
-        }}
       >
         <div {...dragHandlers} data-row-action="true" className="cursor-move touch-none flex-shrink-0">
           <GripVertical className="h-4 w-4 text-muted-foreground" />
@@ -470,7 +460,7 @@ export const WysiwygEditor = () => {
           }}
           placeholder="Name"
           autoFocus={focusedId === link.id}
-          className="basis-[30%] flex-none min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          className="w-[30%] flex-shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Input
           value={url}
@@ -484,7 +474,7 @@ export const WysiwygEditor = () => {
             if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
           }}
           placeholder="URL"
-          className="basis-[70%] flex-none min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          className="w-[70%] flex-shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Button
           size="sm"

@@ -116,6 +116,7 @@ export const WysiwygEditor = () => {
       parent.children = [...parent.children, newFolder];
     }
     
+    setFocusedId(newFolder.id);
     addToHistory(updatedList.children);
     updateList(updatedList);
   };
@@ -141,6 +142,7 @@ export const WysiwygEditor = () => {
       parent.children = [...parent.children, newLink];
     }
     
+    setFocusedId(newLink.id);
     addToHistory(updatedList.children);
     updateList(updatedList);
   };
@@ -297,6 +299,7 @@ export const WysiwygEditor = () => {
     dragHandlers?: any;
   }) => {
     const [name, setName] = useState(folder.name);
+    const nameInputRef = useRef<HTMLInputElement>(null);
     useEffect(() => {
       setName(folder.name);
     }, [folder.name]);
@@ -307,16 +310,22 @@ export const WysiwygEditor = () => {
       <div className="group">
         <div
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0",
+            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
             focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
+          onClick={(e) => {
+            const target = e.target as HTMLElement;
+            if (target.closest('[data-row-action="true"]')) return;
+            nameInputRef.current?.focus();
+          }}
         >
-          <div {...dragHandlers} className="cursor-move touch-none flex-shrink-0">
+          <div {...dragHandlers} data-row-action="true" className="cursor-move touch-none flex-shrink-0">
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </div>
           <button
             onClick={() => toggleCollapse(path)}
+            data-row-action="true"
             className="text-sm flex items-center justify-center w-4 h-4 flex-shrink-0"
           >
             {isCollapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
@@ -325,6 +334,7 @@ export const WysiwygEditor = () => {
             {isCollapsed ? '📁' : '📂'}
           </span>
           <Input
+            ref={nameInputRef}
             value={name}
             onChange={(e) => setName(e.target.value)}
             onFocus={() => setFocusedId(folder.id)}
@@ -335,10 +345,11 @@ export const WysiwygEditor = () => {
               e.stopPropagation();
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
+            autoFocus={focusedId === folder.id}
             className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           {!isCollapsed && (
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-none basis-[112px] justify-end">
               <Button
                 size="sm"
                 variant="ghost"
@@ -416,6 +427,7 @@ export const WysiwygEditor = () => {
   }) => {
     const [name, setName] = useState(link.name);
     const [url, setUrl] = useState(link.url);
+    const nameInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
       setName(link.name);
@@ -428,18 +440,24 @@ export const WysiwygEditor = () => {
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0",
+          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
           focusedId === link.id && "bg-muted"
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
+        onClick={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.closest('[data-row-action="true"]')) return;
+          nameInputRef.current?.focus();
+        }}
       >
-        <div {...dragHandlers} className="cursor-move touch-none flex-shrink-0">
+        <div {...dragHandlers} data-row-action="true" className="cursor-move touch-none flex-shrink-0">
           <GripVertical className="h-4 w-4 text-muted-foreground" />
         </div>
         <span className="text-lg cursor-pointer flex-shrink-0" onClick={() => setFocusedId(link.id)}>
           🔖
         </span>
         <Input
+          ref={nameInputRef}
           value={name}
           onChange={(e) => setName(e.target.value)}
           onFocus={() => setFocusedId(link.id)}
@@ -451,7 +469,8 @@ export const WysiwygEditor = () => {
             if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
           }}
           placeholder="Name"
-          className="flex-[1_1_0%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          autoFocus={focusedId === link.id}
+          className="basis-[30%] flex-none min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Input
           value={url}
@@ -465,7 +484,7 @@ export const WysiwygEditor = () => {
             if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
           }}
           placeholder="URL"
-          className="flex-[2_2_0%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          className="basis-[70%] flex-none min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Button
           size="sm"
@@ -507,7 +526,7 @@ export const WysiwygEditor = () => {
             }}
             className="flex-1 min-w-0 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
           />
-          <div className="flex gap-1">
+          <div className="flex gap-1 flex-none basis-[112px] justify-end">
             <Button
               size="sm"
               variant="ghost"

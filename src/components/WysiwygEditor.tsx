@@ -28,6 +28,7 @@ export const WysiwygEditor = () => {
   const { currentList, updateList, addToHistory, undo, redo } = useBookmarks();
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
+  const [topName, setTopName] = useState(currentList?.topLevelName || "");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
@@ -43,6 +44,13 @@ export const WysiwygEditor = () => {
       inputRef.current.select();
     }
   }, [editingName]);
+
+  // Sync top-level name with current list
+  useEffect(() => {
+    if (currentList) {
+      setTopName(currentList.topLevelName);
+    }
+  }, [currentList?.topLevelName]);
 
   // Keyboard shortcuts for undo/redo
   useEffect(() => {
@@ -268,27 +276,38 @@ export const WysiwygEditor = () => {
 
     return (
       <div ref={setNodeRef} style={style} {...attributes}>
-        {item.type === 'folder' ? 
-          renderFolder(item as BookmarkFolder, path, depth, listeners) : 
-          renderLink(item as BookmarkLink, path, depth, listeners)
-        }
+        {item.type === 'folder' ? (
+          <FolderRow folder={item as BookmarkFolder} path={path} depth={depth} dragHandlers={listeners} />
+        ) : (
+          <LinkRow link={item as BookmarkLink} path={path} depth={depth} dragHandlers={listeners} />
+        )}
       </div>
     );
   };
 
-  const renderFolder = (
-    folder: BookmarkFolder, 
-    path: number[], 
-    depth: number, 
-    dragHandlers?: any
-  ) => {
+  const FolderRow = ({
+    folder,
+    path,
+    depth,
+    dragHandlers,
+  }: {
+    folder: BookmarkFolder;
+    path: number[];
+    depth: number;
+    dragHandlers?: any;
+  }) => {
+    const [name, setName] = useState(folder.name);
+    useEffect(() => {
+      setName(folder.name);
+    }, [folder.name]);
+
     const isCollapsed = folder.collapsed || false;
-    
+
     return (
       <div className="group">
-        <div 
+        <div
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
+            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0",
             focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
@@ -306,9 +325,16 @@ export const WysiwygEditor = () => {
             {isCollapsed ? '📁' : '📂'}
           </span>
           <Input
-            value={folder.name}
-            onChange={(e) => updateItemName(path, e.target.value)}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             onFocus={() => setFocusedId(folder.id)}
+            onBlur={() => {
+              if (name !== folder.name) updateItemName(path, name);
+            }}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
+            }}
             className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           {!isCollapsed && (
@@ -377,16 +403,32 @@ export const WysiwygEditor = () => {
     );
   };
 
-  const renderLink = (
-    link: BookmarkLink, 
-    path: number[], 
-    depth: number,
-    dragHandlers?: any
-  ) => {
+  const LinkRow = ({
+    link,
+    path,
+    depth,
+    dragHandlers,
+  }: {
+    link: BookmarkLink;
+    path: number[];
+    depth: number;
+    dragHandlers?: any;
+  }) => {
+    const [name, setName] = useState(link.name);
+    const [url, setUrl] = useState(link.url);
+
+    useEffect(() => {
+      setName(link.name);
+    }, [link.name]);
+
+    useEffect(() => {
+      setUrl(link.url);
+    }, [link.url]);
+
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
+          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0",
           focusedId === link.id && "bg-muted"
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
@@ -398,18 +440,32 @@ export const WysiwygEditor = () => {
           🔖
         </span>
         <Input
-          value={link.name}
-          onChange={(e) => updateItemName(path, e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           onFocus={() => setFocusedId(link.id)}
+          onBlur={() => {
+            if (name !== link.name) updateItemName(path, name);
+          }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
+          }}
           placeholder="Name"
-          className="w-[30%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          className="flex-[1_1_0%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Input
-          value={link.url}
-          onChange={(e) => updateLinkUrl(path, e.target.value)}
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
           onFocus={() => setFocusedId(link.id)}
+          onBlur={() => {
+            if (url !== link.url) updateLinkUrl(path, url);
+          }}
+          onKeyDown={(e) => {
+            e.stopPropagation();
+            if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
+          }}
           placeholder="URL"
-          className="w-[70%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          className="flex-[2_2_0%] min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
         />
         <Button
           size="sm"
@@ -429,18 +485,27 @@ export const WysiwygEditor = () => {
     <div className="h-full overflow-y-auto bg-editor p-4">
       <div className="space-y-1">
         {/* Top level folder */}
-        <div className="flex items-center gap-2 mb-4 p-2 rounded bg-card">
+        <div className="flex items-center gap-2 mb-4 p-2 rounded bg-card min-w-0">
           <span className="text-2xl">📂</span>
           <Input
             ref={editingName ? inputRef : null}
-            value={currentList.topLevelName}
-            onChange={(e) => {
-              const updated = { ...currentList, topLevelName: e.target.value };
-              updateList(updated);
-            }}
+            value={topName}
+            onChange={(e) => setTopName(e.target.value)}
             onFocus={() => setEditingName(true)}
-            onBlur={() => setEditingName(false)}
-            className="flex-1 text-lg font-semibold bg-transparent border-none focus:bg-background"
+            onBlur={() => {
+              setEditingName(false);
+              if (topName !== currentList.topLevelName) {
+                const updated = { ...currentList, topLevelName: topName };
+                updateList(updated);
+              }
+            }}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === 'Enter') {
+                (e.currentTarget as HTMLInputElement).blur();
+              }
+            }}
+            className="flex-1 min-w-0 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
           />
           <div className="flex gap-1">
             <Button

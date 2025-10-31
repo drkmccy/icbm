@@ -310,7 +310,7 @@ export const WysiwygEditor = () => {
       <div className="group">
         <div
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
+            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
             focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
@@ -341,10 +341,10 @@ export const WysiwygEditor = () => {
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
             autoFocus={focusedId === folder.id}
-            className="flex-1 min-w-0 max-w-[50%] h-7 bg-transparent border-none focus:bg-background truncate"
+            className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           {!isCollapsed && (
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 w-[112px] justify-end">
+            <div className="ml-auto flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 w-[112px] justify-end">
               <Button
                 size="sm"
                 variant="ghost"
@@ -435,7 +435,7 @@ export const WysiwygEditor = () => {
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50",
+          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
           focusedId === link.id && "bg-muted"
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
@@ -491,10 +491,10 @@ export const WysiwygEditor = () => {
 
 
   return (
-    <div className="h-full overflow-y-auto bg-editor p-4">
+    <div className="h-full overflow-y-auto overflow-x-hidden bg-editor p-4">
       <div className="space-y-1">
         {/* Top level folder */}
-        <div className="flex items-center gap-2 mb-4 p-2 rounded bg-card min-w-0">
+        <div className="flex items-center gap-2 mb-4 p-2 rounded bg-card min-w-0 w-full">
           <span className="text-2xl">📂</span>
           <Input
             ref={editingName ? inputRef : null}
@@ -516,7 +516,7 @@ export const WysiwygEditor = () => {
             }}
             className="flex-1 min-w-0 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
           />
-          <div className="flex gap-1 flex-none basis-[112px] justify-end">
+          <div className="ml-auto flex gap-1 flex-shrink-0 w-[112px] justify-end">
             <Button
               size="sm"
               variant="ghost"

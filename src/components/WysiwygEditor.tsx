@@ -310,7 +310,7 @@ export const WysiwygEditor = () => {
       <div className="group">
         <div
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full overflow-hidden",
+            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
             focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
@@ -341,7 +341,7 @@ export const WysiwygEditor = () => {
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
             autoFocus={focusedId === folder.id}
-            className="flex-1 min-w-0 max-w-full h-7 bg-transparent border-none focus:bg-background truncate"
+            className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           <div className="ml-auto flex-shrink-0 w-[152px]">
             <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
@@ -439,7 +439,7 @@ export const WysiwygEditor = () => {
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full overflow-hidden",
+          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
           focusedId === link.id && "bg-muted"
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
@@ -450,7 +450,7 @@ export const WysiwygEditor = () => {
         <span className="text-lg cursor-pointer flex-shrink-0" onClick={() => setFocusedId(link.id)}>
           🔖
         </span>
-        <div className="flex-1 min-w-0 max-w-full flex items-center gap-2 overflow-hidden">
+        <div className="flex-1 min-w-0 flex items-center gap-2">
           <Input
             ref={nameInputRef}
             value={name}
@@ -465,7 +465,7 @@ export const WysiwygEditor = () => {
             }}
             placeholder="Name"
             autoFocus={focusedId === link.id}
-            className="basis-[30%] min-w-0 max-w-full h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+            className="basis-[30%] shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
           />
           <Input
             value={url}
@@ -479,7 +479,7 @@ export const WysiwygEditor = () => {
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
             placeholder="URL"
-            className="basis-[70%] min-w-0 max-w-full h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+            className="basis-[70%] shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
           />
         </div>
         <div className="ml-auto flex-shrink-0 w-[40px] flex justify-end">
@@ -502,7 +502,7 @@ export const WysiwygEditor = () => {
     <div className="h-full overflow-y-auto overflow-x-hidden bg-editor p-4">
       <div className="space-y-1">
         {/* Top level folder */}
-        <div className="flex items-center gap-2 mb-4 p-2 rounded bg-card min-w-0 w-full overflow-hidden">
+        <div className="flex items-center gap-2 mb-4 p-2 rounded bg-card min-w-0 w-full">
           <span className="text-2xl">📂</span>
           <Input
             ref={editingName ? inputRef : null}
@@ -522,7 +522,7 @@ export const WysiwygEditor = () => {
                 (e.currentTarget as HTMLInputElement).blur();
               }
             }}
-            className="flex-1 min-w-0 max-w-full text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
+            className="flex-1 min-w-0 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
           />
           <div className="ml-auto flex gap-1 flex-shrink-0 w-[112px] justify-end">
             <Button

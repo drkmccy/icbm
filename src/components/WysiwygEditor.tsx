@@ -343,46 +343,50 @@ export const WysiwygEditor = () => {
             autoFocus={focusedId === folder.id}
             className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
-          {!isCollapsed && (
-            <div className="ml-auto flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 w-[112px] justify-end">
+          <div className="ml-auto flex-shrink-0 w-[152px]">
+            <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+              {!isCollapsed && (
+                <>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => sortFolder(path)}
+                    className="h-6 w-6 p-0"
+                    title="Sort"
+                  >
+                    ↕️
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => addFolder(path)}
+                    className="h-6 w-6 p-0"
+                    title="Add Subfolder"
+                  >
+                    📂
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => addLink(path)}
+                    className="h-6 w-6 p-0"
+                    title="Add Link"
+                  >
+                    🔖
+                  </Button>
+                </>
+              )}
               <Button
                 size="sm"
                 variant="ghost"
-                onClick={() => sortFolder(path)}
+                onClick={() => deleteItem(path)}
                 className="h-6 w-6 p-0"
-                title="Sort"
+                title="Delete"
               >
-                ↕️
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => addFolder(path)}
-                className="h-6 w-6 p-0"
-                title="Add Subfolder"
-              >
-                📂
-              </Button>
-              <Button
-                size="sm"
-                variant="ghost"
-                onClick={() => addLink(path)}
-                className="h-6 w-6 p-0"
-                title="Add Link"
-              >
-                🔖
+                <Trash2 className="h-4 w-4" />
               </Button>
             </div>
-          )}
-          <Button
-            size="sm"
-            variant="ghost"
-            onClick={() => deleteItem(path)}
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-            title="Delete"
-          >
-            <Trash2 className="h-4 w-4" />
-          </Button>
+          </div>
         </div>
         {!isCollapsed && folder.children.length > 0 && (
           <DndContext
@@ -446,45 +450,49 @@ export const WysiwygEditor = () => {
         <span className="text-lg cursor-pointer flex-shrink-0" onClick={() => setFocusedId(link.id)}>
           🔖
         </span>
-        <Input
-          ref={nameInputRef}
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          onFocus={() => setFocusedId(link.id)}
-          onBlur={() => {
-            if (name !== link.name) updateItemName(path, name);
-          }}
-          onKeyDown={(e) => {
-            e.stopPropagation();
-            if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
-          }}
-          placeholder="Name"
-          autoFocus={focusedId === link.id}
-          className="w-[30%] flex-shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
-        />
-        <Input
-          value={url}
-          onChange={(e) => setUrl(e.target.value)}
-          onFocus={() => setFocusedId(link.id)}
-          onBlur={() => {
-            if (url !== link.url) updateLinkUrl(path, url);
-          }}
-          onKeyDown={(e) => {
-            e.stopPropagation();
-            if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
-          }}
-          placeholder="URL"
-          className="w-[70%] flex-shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
-        />
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={() => deleteItem(path)}
-          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
-          title="Delete"
-        >
-          <Trash2 className="h-4 w-4" />
-        </Button>
+        <div className="flex-1 min-w-0 flex items-center gap-2">
+          <Input
+            ref={nameInputRef}
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            onFocus={() => setFocusedId(link.id)}
+            onBlur={() => {
+              if (name !== link.name) updateItemName(path, name);
+            }}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
+            }}
+            placeholder="Name"
+            autoFocus={focusedId === link.id}
+            className="basis-[30%] shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          />
+          <Input
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
+            onFocus={() => setFocusedId(link.id)}
+            onBlur={() => {
+              if (url !== link.url) updateLinkUrl(path, url);
+            }}
+            onKeyDown={(e) => {
+              e.stopPropagation();
+              if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
+            }}
+            placeholder="URL"
+            className="basis-[70%] shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
+          />
+        </div>
+        <div className="ml-auto flex-shrink-0 w-[40px] flex justify-end">
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={() => deleteItem(path)}
+            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            title="Delete"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
       </div>
     );
   };

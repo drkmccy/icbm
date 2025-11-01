@@ -177,19 +177,20 @@ export const CodeEditor = () => {
       </div>
       
       <div className="flex-1 overflow-auto bg-code relative">
-        <pre className="p-4 text-sm font-mono">
+        <pre className="p-4 text-sm font-mono min-w-max">
           <code 
             dangerouslySetInnerHTML={{ __html: highlightCode(code, exportFormat) }}
-            className={`block text-code-foreground ${!isValidCode ? 'border-2 border-destructive' : ''}`}
+            className={`block text-code-foreground whitespace-pre ${!isValidCode ? 'border-2 border-destructive' : ''}`}
           />
         </pre>
         
         <textarea
           value={code}
           onChange={(e) => handleCodeChange(e.target.value)}
-          className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-transparent resize-none focus:outline-none caret-code-foreground overflow-hidden"
+          className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-transparent resize-none focus:outline-none caret-code-foreground overflow-auto"
           spellCheck={false}
           style={{ caretColor: 'hsl(var(--code-foreground))' }}
+          wrap="off"
         />
       </div>
       

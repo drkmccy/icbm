@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useBookmarks } from '@/contexts/BookmarkContext';
 import { ExportFormat } from '@/types/bookmark';
 import { Button } from './ui/button';
@@ -17,6 +17,12 @@ export const CodeEditor = () => {
   const { currentList, updateList, exportFormat, setExportFormat, addToHistory } = useBookmarks();
   const [code, setCode] = useState('');
   const [isValidCode, setIsValidCode] = useState(true);
+  const textAreaRef = useRef<HTMLTextAreaElement>(null);
+  const [scrollPos, setScrollPos] = useState({ left: 0, top: 0 });
+  const handleEditorScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
+    const el = e.currentTarget;
+    setScrollPos({ left: el.scrollLeft, top: el.scrollTop });
+  };
 
   useEffect(() => {
     if (currentList) {
@@ -176,17 +182,26 @@ export const CodeEditor = () => {
         </div>
       </div>
       
-      <div className="flex-1 overflow-auto bg-code relative">
-        <pre className="p-4 text-sm font-mono min-w-max">
-          <code 
-            dangerouslySetInnerHTML={{ __html: highlightCode(code, exportFormat) }}
-            className={`block text-code-foreground whitespace-pre ${!isValidCode ? 'border-2 border-destructive' : ''}`}
-          />
-        </pre>
+      <div className="flex-1 bg-code relative overflow-hidden">
+        {/* Highlight layer - synced with textarea scroll, non-interactive */}
+        <div className="absolute inset-0 overflow-hidden p-4 pointer-events-none">
+          <pre
+            className="text-sm font-mono w-max"
+            style={{ transform: `translate(${-scrollPos.left}px, ${-scrollPos.top}px)` }}
+          >
+            <code 
+              dangerouslySetInnerHTML={{ __html: highlightCode(code, exportFormat) }}
+              className={`block text-code-foreground whitespace-pre ${!isValidCode ? 'border-2 border-destructive' : ''}`}
+            />
+          </pre>
+        </div>
         
+        {/* Editing layer - shows scrollbars */}
         <textarea
+          ref={textAreaRef}
           value={code}
           onChange={(e) => handleCodeChange(e.target.value)}
+          onScroll={handleEditorScroll}
           className="absolute inset-0 w-full h-full p-4 font-mono text-sm bg-transparent text-transparent resize-none focus:outline-none caret-code-foreground overflow-auto"
           spellCheck={false}
           style={{ caretColor: 'hsl(var(--code-foreground))' }}

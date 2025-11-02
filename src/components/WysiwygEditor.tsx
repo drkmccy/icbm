@@ -340,7 +340,7 @@ export const WysiwygEditor = () => {
               e.stopPropagation();
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
-            autoFocus={focusedId === folder.id}
+            autoFocus={!editingName && focusedId === folder.id}
             className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           <div className="ml-auto flex-shrink-0 w-[152px]">
@@ -464,7 +464,7 @@ export const WysiwygEditor = () => {
               if (e.key === 'Enter') (e.currentTarget as HTMLInputElement).blur();
             }}
             placeholder="Name"
-            autoFocus={focusedId === link.id}
+            autoFocus={!editingName && focusedId === link.id}
             className="basis-[30%] shrink-0 min-w-0 h-7 bg-transparent border-none focus:bg-background rounded-full truncate"
           />
           <Input
@@ -522,7 +522,7 @@ export const WysiwygEditor = () => {
                 (e.currentTarget as HTMLInputElement).blur();
               }
             }}
-            className="flex-1 min-w-0 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
+            className="w-auto flex-1 min-w-0 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
           />
           <div className="ml-auto flex gap-1 flex-shrink-0 w-[112px] justify-end">
             <Button

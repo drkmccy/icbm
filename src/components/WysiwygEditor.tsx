@@ -522,7 +522,7 @@ export const WysiwygEditor = () => {
                 (e.currentTarget as HTMLInputElement).blur();
               }
             }}
-            className="w-auto flex-1 min-w-0 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
+            className="flex-1 min-w-0 mr-2 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
           />
           <div className="ml-auto flex gap-1 flex-shrink-0 w-[112px] justify-end">
             <Button

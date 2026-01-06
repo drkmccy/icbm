@@ -50,6 +50,17 @@ export const SettingsModal = ({ open, onClose }: SettingsModalProps) => {
               </SelectContent>
             </Select>
           </div>
+          
+          <div className="pt-4 border-t border-border">
+            <a
+              href="https://buymeacoffee.com/drkmccy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              ☕ Buy me a coffee
+            </a>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

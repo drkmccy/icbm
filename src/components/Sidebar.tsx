@@ -107,20 +107,6 @@ export const Sidebar = ({ onOpenSettings, onOpenImport }: SidebarProps) => {
           <Settings className="h-4 w-4" />
           Settings
         </Button>
-        
-        <a
-          href="https://buymeacoffee.com/drkmccy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block"
-        >
-          <Button
-            variant="ghost"
-            className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent"
-          >
-            ☕Buy me a coffee
-          </Button>
-        </a>
       </div>
     </div>
   );

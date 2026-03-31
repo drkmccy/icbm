@@ -307,10 +307,10 @@ export const WysiwygEditor = () => {
     const isCollapsed = folder.collapsed || false;
 
     return (
-      <div className="group/item">
+      <div>
         <div
           className={cn(
-            "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
+            "group/item flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
             focusedId === folder.id && "bg-muted"
           )}
           style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}

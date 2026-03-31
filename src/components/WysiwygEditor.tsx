@@ -344,7 +344,7 @@ export const WysiwygEditor = () => {
             className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           <div className="ml-auto flex-shrink-0 w-[152px]">
-            <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex gap-1 justify-end opacity-0 group-hover/item:opacity-100 transition-opacity">
               {!isCollapsed && (
                 <>
                   <Button

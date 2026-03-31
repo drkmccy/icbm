@@ -307,7 +307,7 @@ export const WysiwygEditor = () => {
     const isCollapsed = folder.collapsed || false;
 
     return (
-      <div className="group">
+      <div className="group/item">
         <div
           className={cn(
             "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
@@ -344,7 +344,7 @@ export const WysiwygEditor = () => {
             className="flex-1 min-w-0 h-7 bg-transparent border-none focus:bg-background truncate"
           />
           <div className="ml-auto flex-shrink-0 w-[152px]">
-            <div className="flex gap-1 justify-end opacity-0 group-hover:opacity-100 transition-opacity">
+            <div className="flex gap-1 justify-end opacity-0 group-hover/item:opacity-100 transition-opacity">
               {!isCollapsed && (
                 <>
                   <Button
@@ -439,7 +439,7 @@ export const WysiwygEditor = () => {
     return (
       <div
         className={cn(
-          "group flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
+          "group/item flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",
           focusedId === link.id && "bg-muted"
         )}
         style={{ paddingLeft: `${depth * 1.5 + 0.5}rem` }}
@@ -487,7 +487,7 @@ export const WysiwygEditor = () => {
             size="sm"
             variant="ghost"
             onClick={() => deleteItem(path)}
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-6 w-6 p-0 opacity-0 group-hover/item:opacity-100 transition-opacity"
             title="Delete"
           >
             <Trash2 className="h-4 w-4" />

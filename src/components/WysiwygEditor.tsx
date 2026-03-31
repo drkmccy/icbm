@@ -487,7 +487,7 @@ export const WysiwygEditor = () => {
             size="sm"
             variant="ghost"
             onClick={() => deleteItem(path)}
-            className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-6 w-6 p-0 opacity-0 group-hover/item:opacity-100 transition-opacity"
             title="Delete"
           >
             <Trash2 className="h-4 w-4" />

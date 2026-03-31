@@ -307,7 +307,7 @@ export const WysiwygEditor = () => {
     const isCollapsed = folder.collapsed || false;
 
     return (
-      <div className="group">
+      <div className="group/item">
         <div
           className={cn(
             "flex items-center gap-2 py-1 px-2 rounded transition-colors hover:bg-muted/50 min-w-0 w-full",

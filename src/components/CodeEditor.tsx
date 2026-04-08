@@ -125,29 +125,29 @@ export const CodeEditor = () => {
     let highlighted = escapeHtml(code);
     
     if (format === 'json') {
-      // Highlight JSON: keys=purple, strings=green, numbers=orange, booleans/null=purple
+      // Solarized JSON: keys=blue, strings=green, numbers=orange, booleans/null=violet
       highlighted = highlighted
-        .replace(/("(?:[^"\\]|\\.)*?")\s*:/g, '<span class="syntax-purple">$1</span>:')
+        .replace(/("(?:[^"\\]|\\.)*?")\s*:/g, '<span class="syntax-cyan">$1</span>:')
         .replace(/:\s*("(?:[^"\\]|\\.)*?")/g, ': <span class="syntax-green">$1</span>')
         .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="syntax-orange">$1</span>')
         .replace(/:\s*(true|false|null)/g, ': <span class="syntax-purple">$1</span>');
     } else if (format === 'html') {
-      // Highlight HTML: tags=pink, attributes=cyan, values=green
+      // Solarized HTML: tags=magenta, attributes=blue, values=green
       highlighted = highlighted
         .replace(/(&lt;\/?)([\w-]+)(\s|&gt;)/g, '$1<span class="syntax-pink">$2</span>$3')
         .replace(/([\w-]+)=(&quot;)/g, '<span class="syntax-cyan">$1</span>=$2')
         .replace(/=(&quot;)((?:[^&]|&(?!quot;))*?)(&quot;)/g, '=<span class="syntax-green">$1$2$3</span>');
     } else if (format === 'plist') {
-      // Highlight Plist (XML-based)
+      // Solarized Plist: type tags=cyan, keys=blue, strings=green
       highlighted = highlighted
-        .replace(/&lt;(\/?[\w-]+)/g, '&lt;<span class="syntax-pink">$1</span>')
-        .replace(/&gt;/g, '<span class="syntax-pink">&gt;</span>')
+        .replace(/&lt;(\/?[\w-]+)/g, '&lt;<span class="syntax-cyan">$1</span>')
+        .replace(/&gt;/g, '<span class="syntax-cyan">&gt;</span>')
         .replace(/&lt;(key|string|array|dict)&gt;(.*?)&lt;\/(key|string|array|dict)&gt;/g, 
           (match, tag1, content, tag2) => {
-            const coloredTag1 = `&lt;<span class="syntax-pink">${tag1}</span>&gt;`;
-            const coloredTag2 = `&lt;/<span class="syntax-pink">${tag2}</span>&gt;`;
+            const coloredTag1 = `&lt;<span class="syntax-cyan">${tag1}</span>&gt;`;
+            const coloredTag2 = `&lt;/<span class="syntax-cyan">${tag2}</span>&gt;`;
             const coloredContent = tag1 === 'key' 
-              ? `<span class="syntax-cyan">${content}</span>`
+              ? `<span class="syntax-pink">${content}</span>`
               : `<span class="syntax-green">${content}</span>`;
             return `${coloredTag1}${coloredContent}${coloredTag2}`;
           });

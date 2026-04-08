@@ -8,115 +8,113 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Solarized Light */
-    --background: 44 87% 94%;       /* base3 #fdf6e3 */
-    --foreground: 195 10% 45%;      /* base00 #657b83 */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 20%;
 
-    --card: 44 44% 85%;             /* base2 #eee8d5 */
-    --card-foreground: 195 10% 45%; /* base00 */
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 20%;
 
-    --popover: 44 87% 94%;          /* base3 */
-    --popover-foreground: 195 10% 45%; /* base00 */
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 20%;
 
-    --primary: 205 82% 49%;         /* blue #268bd2 */
-    --primary-foreground: 44 87% 94%; /* base3 */
+    --primary: 215 30% 35%;
+    --primary-foreground: 210 20% 98%;
 
-    --secondary: 44 44% 85%;        /* base2 */
-    --secondary-foreground: 195 10% 45%; /* base00 */
+    --secondary: 210 15% 92%;
+    --secondary-foreground: 215 25% 20%;
 
-    --muted: 44 44% 85%;            /* base2 */
-    --muted-foreground: 195 12% 40%; /* base01 */
+    --muted: 210 15% 95%;
+    --muted-foreground: 215 15% 50%;
 
-    --accent: 45 100% 36%;          /* yellow #b58900 */
-    --accent-foreground: 44 87% 94%; /* base3 */
+    --accent: 38 95% 62%;
+    --accent-foreground: 215 25% 20%;
 
-    --destructive: 1 71% 52%;       /* red #dc322f */
-    --destructive-foreground: 44 87% 94%; /* base3 */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 44 44% 80%;
-    --input: 44 44% 80%;
-    --ring: 205 82% 49%;             /* blue */
+    --border: 215 20% 88%;
+    --input: 215 20% 88%;
+    --ring: 38 95% 62%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 193 100% 11%; /* base03 */
-    --sidebar-foreground: 186 8% 55%;   /* base0 */
-    --sidebar-primary: 45 100% 36%;     /* yellow */
-    --sidebar-primary-foreground: 44 87% 94%; /* base3 */
-    --sidebar-accent: 192 81% 14%;      /* base02 */
-    --sidebar-accent-foreground: 44 44% 85%; /* base2 */
-    --sidebar-border: 192 81% 14%;      /* base02 */
-    --sidebar-ring: 205 82% 49%;        /* blue */
+    --sidebar-background: 215 25% 18%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 38 95% 62%;
+    --sidebar-primary-foreground: 215 25% 20%;
+    --sidebar-accent: 215 25% 24%;
+    --sidebar-accent-foreground: 210 20% 95%;
+    --sidebar-border: 215 25% 22%;
+    --sidebar-ring: 38 95% 62%;
     
-    --editor-background: 44 44% 85%;    /* base2 */
+    --editor-background: 210 15% 96%;
     
-    /* Solarized Light Code Editor */
-    --code-background: 44 87% 94%;      /* base3 */
-    --code-foreground: 195 10% 45%;     /* base00 */
-    --code-comment: 195 12% 40%;        /* base01 */
-    --code-selection: 44 44% 80%;
-    --code-red: 1 71% 52%;              /* red */
-    --code-orange: 18 89% 44%;          /* orange */
-    --code-yellow: 45 100% 36%;         /* yellow */
-    --code-green: 68 100% 30%;          /* green */
-    --code-cyan: 175 74% 40%;           /* cyan */
-    --code-purple: 237 45% 60%;         /* violet */
-    --code-pink: 331 64% 52%;           /* magenta */
+    /* Light Theme Colors for Code Editor */
+    --code-background: 48 100% 96%;
+    --code-foreground: 0 0% 12%;
+    --code-comment: 48 19% 36%;
+    --code-selection: 240 20% 83%;
+    --code-red: 6 66% 48%;
+    --code-orange: 25 78% 36%;
+    --code-yellow: 48 75% 30%;
+    --code-green: 113 86% 25%;
+    --code-cyan: 196 97% 30%;
+    --code-purple: 251 57% 54%;
+    --code-pink: 335 79% 36%;
   }
 
   .dark {
-    /* Solarized Dark */
-    --background: 193 100% 11%;      /* base03 #002b36 */
-    --foreground: 186 8% 55%;        /* base0 #839496 */
+    --background: 215 25% 12%;
+    --foreground: 210 20% 90%;
 
-    --card: 192 81% 14%;             /* base02 #073642 */
-    --card-foreground: 186 8% 55%;   /* base0 */
+    --card: 215 25% 15%;
+    --card-foreground: 210 20% 90%;
 
-    --popover: 192 81% 14%;          /* base02 */
-    --popover-foreground: 186 8% 55%; /* base0 */
+    --popover: 215 25% 15%;
+    --popover-foreground: 210 20% 90%;
 
-    --primary: 205 82% 49%;          /* blue #268bd2 */
-    --primary-foreground: 193 100% 11%; /* base03 */
+    --primary: 210 20% 85%;
+    --primary-foreground: 215 25% 15%;
 
-    --secondary: 192 81% 14%;        /* base02 */
-    --secondary-foreground: 186 8% 55%; /* base0 */
+    --secondary: 215 25% 20%;
+    --secondary-foreground: 210 20% 90%;
 
-    --muted: 192 81% 14%;            /* base02 */
-    --muted-foreground: 195 12% 40%; /* base01 */
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 15% 60%;
 
-    --accent: 45 100% 36%;           /* yellow #b58900 */
-    --accent-foreground: 193 100% 11%; /* base03 */
+    --accent: 38 95% 62%;
+    --accent-foreground: 215 25% 12%;
 
-    --destructive: 1 71% 52%;        /* red */
-    --destructive-foreground: 44 87% 94%; /* base3 */
+    --destructive: 0 75% 55%;
+    --destructive-foreground: 210 20% 98%;
 
-    --border: 192 81% 18%;
-    --input: 192 81% 18%;
-    --ring: 205 82% 49%;              /* blue */
+    --border: 215 25% 22%;
+    --input: 215 25% 22%;
+    --ring: 38 95% 62%;
     
-    --sidebar-background: 193 100% 8%;
-    --sidebar-foreground: 186 8% 55%;   /* base0 */
-    --sidebar-primary: 45 100% 36%;     /* yellow */
-    --sidebar-primary-foreground: 193 100% 11%; /* base03 */
-    --sidebar-accent: 193 100% 14%;
-    --sidebar-accent-foreground: 180 7% 60%; /* base1 */
-    --sidebar-border: 193 100% 11%;     /* base03 */
-    --sidebar-ring: 205 82% 49%;        /* blue */
+    --sidebar-background: 215 25% 8%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 38 95% 62%;
+    --sidebar-primary-foreground: 215 25% 12%;
+    --sidebar-accent: 215 25% 14%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 215 25% 12%;
+    --sidebar-ring: 38 95% 62%;
     
-    --editor-background: 192 81% 14%;   /* base02 */
+    --editor-background: 215 25% 14%;
     
-    /* Solarized Dark Code Editor */
-    --code-background: 193 100% 11%;    /* base03 */
-    --code-foreground: 186 8% 55%;      /* base0 */
-    --code-comment: 195 12% 40%;        /* base01 */
-    --code-selection: 192 81% 18%;
-    --code-red: 1 71% 52%;              /* red */
-    --code-orange: 18 89% 44%;          /* orange */
-    --code-yellow: 45 100% 36%;         /* yellow */
-    --code-green: 68 100% 30%;          /* green */
-    --code-cyan: 175 74% 40%;           /* cyan */
-    --code-purple: 237 45% 60%;         /* violet */
-    --code-pink: 331 64% 52%;           /* magenta */
+    /* Dark Theme Colors for Code Editor (Dracula) */
+    --code-background: 231 15% 18%;
+    --code-foreground: 60 30% 96%;
+    --code-comment: 225 27% 51%;
+    --code-selection: 232 14% 31%;
+    --code-red: 0 100% 67%;
+    --code-orange: 31 100% 71%;
+    --code-yellow: 65 92% 76%;
+    --code-green: 135 94% 65%;
+    --code-cyan: 191 97% 77%;
+    --code-purple: 265 89% 78%;
+    --code-pink: 326 100% 74%;
   }
 }
 

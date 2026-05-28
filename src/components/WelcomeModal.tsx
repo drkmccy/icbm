@@ -26,7 +26,7 @@ export const WelcomeModal = () => {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 font-display">
             <Sparkles className="h-5 w-5 text-accent" />
-            Hey there, friend!
+            Howdy! 👋
           </DialogTitle>
           <DialogDescription asChild>
             <div className="space-y-3 pt-2 text-sm text-muted-foreground">
@@ -40,7 +40,7 @@ export const WelcomeModal = () => {
                 no trackers, no shady stuff. Just you and your bookmarks.
               </p>
               <p className="text-xs italic">
-                (Close this with the × or hit Esc — no buttons to click, no terms to accept.)
+                (No terms to accept, just hit Esc!)
               </p>
             </div>
           </DialogDescription>

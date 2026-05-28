@@ -40,6 +40,7 @@ const Index = () => {
 
         <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
+        <WelcomeModal />
       </div>
     </BookmarkProvider>
   );

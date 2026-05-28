@@ -16,8 +16,8 @@ export default {
       fontFamily: {
         sans: ['DM Sans', 'sans-serif'],
         mono: ['DM Mono', 'monospace'],
-        display: ['Black Ops One', 'cursive'],
         display: ['Black Ops One', 'DM Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'monospace'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -5,6 +5,7 @@ import { WysiwygEditor } from '@/components/WysiwygEditor';
 import { CodeEditor } from '@/components/CodeEditor';
 import { SettingsModal } from '@/components/SettingsModal';
 import { ImportModal } from '@/components/ImportModal';
+import { WelcomeModal } from '@/components/WelcomeModal';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 
 const Index = () => {
@@ -39,6 +40,7 @@ const Index = () => {
 
         <SettingsModal open={settingsOpen} onClose={() => setSettingsOpen(false)} />
         <ImportModal open={importOpen} onClose={() => setImportOpen(false)} />
+        <WelcomeModal />
       </div>
     </BookmarkProvider>
   );

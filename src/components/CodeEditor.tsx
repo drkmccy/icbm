@@ -125,12 +125,31 @@ export const CodeEditor = () => {
     let highlighted = escapeHtml(code);
     
     if (format === 'json') {
-      // Highlight JSON: keys=purple, strings=green, numbers=orange, booleans/null=purple
-      highlighted = highlighted
-        .replace(/("(?:[^"\\]|\\.)*?")\s*:/g, '<span class="syntax-purple">$1</span>:')
-        .replace(/:\s*("(?:[^"\\]|\\.)*?")/g, ': <span class="syntax-green">$1</span>')
-        .replace(/:\s*(-?\d+\.?\d*)/g, ': <span class="syntax-orange">$1</span>')
-        .replace(/:\s*(true|false|null)/g, ': <span class="syntax-purple">$1</span>');
+      // Proper token-based JSON highlighting (handles escapes, colons inside
+      // strings, punctuation, and distinguishes keys from string values).
+      const tokenRe = /("(?:\\.|[^"\\])*")(\s*:)?|(-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?)|\b(true|false|null)\b|([{}\[\],:])/g;
+      let out = '';
+      let lastIndex = 0;
+      let match: RegExpExecArray | null;
+      while ((match = tokenRe.exec(code)) !== null) {
+        out += escapeHtml(code.slice(lastIndex, match.index));
+        lastIndex = match.index + match[0].length;
+
+        const [, str, colon, num, keyword, punct] = match;
+        if (str !== undefined) {
+          const cls = colon ? 'syntax-purple' : 'syntax-green';
+          out += `<span class="${cls}">${escapeHtml(str)}</span>`;
+          if (colon) out += escapeHtml(colon.slice(0, -1)) + '<span class="syntax-pink">:</span>';
+        } else if (num !== undefined) {
+          out += `<span class="syntax-orange">${escapeHtml(num)}</span>`;
+        } else if (keyword !== undefined) {
+          out += `<span class="syntax-purple">${escapeHtml(keyword)}</span>`;
+        } else if (punct !== undefined) {
+          out += `<span class="syntax-pink">${escapeHtml(punct)}</span>`;
+        }
+      }
+      out += escapeHtml(code.slice(lastIndex));
+      return out;
     } else if (format === 'html') {
       // Highlight HTML: tags=pink, attributes=cyan, values=green
       highlighted = highlighted

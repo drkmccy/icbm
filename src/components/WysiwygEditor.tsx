@@ -213,45 +213,106 @@ export const WysiwygEditor = () => {
     updateList(updatedList);
   };
 
-  const handleDragEnd = (event: DragEndEvent, parentPath: number[]) => {
+  // --- Tree helpers for cross-folder drag & drop ---
+  const collectVisibleIds = (items: BookmarkItem[]): string[] => {
+    const out: string[] = [];
+    const walk = (list: BookmarkItem[]) => {
+      list.forEach(item => {
+        out.push(item.id);
+        if (item.type === 'folder' && !item.collapsed) walk(item.children);
+      });
+    };
+    walk(items);
+    return out;
+  };
+
+  const findItemById = (items: BookmarkItem[], id: string): BookmarkItem | null => {
+    for (const item of items) {
+      if (item.id === id) return item;
+      if (item.type === 'folder') {
+        const found = findItemById(item.children, id);
+        if (found) return found;
+      }
+    }
+    return null;
+  };
+
+  const removeById = (items: BookmarkItem[], id: string): BookmarkItem | null => {
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id === id) {
+        return items.splice(i, 1)[0];
+      }
+      const item = items[i];
+      if (item.type === 'folder') {
+        const removed = removeById(item.children, id);
+        if (removed) return removed;
+      }
+    }
+    return null;
+  };
+
+  const insertBeside = (items: BookmarkItem[], targetId: string, item: BookmarkItem): boolean => {
+    for (let i = 0; i < items.length; i++) {
+      if (items[i].id === targetId) {
+        items.splice(i, 0, item);
+        return true;
+      }
+      const child = items[i];
+      if (child.type === 'folder' && insertBeside(child.children, targetId, item)) return true;
+    }
+    return false;
+  };
+
+  const insertIntoFolder = (items: BookmarkItem[], folderId: string, item: BookmarkItem): boolean => {
+    for (const child of items) {
+      if (child.type === 'folder') {
+        if (child.id === folderId) {
+          child.children.push(item);
+          child.collapsed = false;
+          return true;
+        }
+        if (insertIntoFolder(child.children, folderId, item)) return true;
+      }
+    }
+    return false;
+  };
+
+  const containsId = (item: BookmarkItem, id: string): boolean => {
+    if (item.id === id) return true;
+    if (item.type === 'folder') return item.children.some(c => containsId(c, id));
+    return false;
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    
     if (!over || active.id === over.id) return;
 
-    const updatedList = { ...currentList };
-    let items: BookmarkItem[];
-    
-    if (parentPath.length === 0) {
-      items = updatedList.children;
-    } else {
-      let current: any = updatedList;
-      for (let i = 0; i < parentPath.length - 1; i++) {
-        current = current.children[parentPath[i]];
-      }
-      const folder = current.children[parentPath[parentPath.length - 1]] as BookmarkFolder;
-      items = folder.children;
-    }
+    const activeId = String(active.id);
+    const overId = String(over.id);
 
-    const oldIndex = items.findIndex(item => item.id === active.id);
-    const newIndex = items.findIndex(item => item.id === over.id);
+    const activeItem = findItemById(currentList.children, activeId);
+    const overItem = findItemById(currentList.children, overId);
+    if (!activeItem || !overItem) return;
 
-    if (oldIndex !== -1 && newIndex !== -1) {
-      const newItems = arrayMove(items, oldIndex, newIndex);
-      
-      if (parentPath.length === 0) {
-        updatedList.children = newItems;
-      } else {
-        let current: any = updatedList;
-        for (let i = 0; i < parentPath.length - 1; i++) {
-          current = current.children[parentPath[i]];
-        }
-        const folder = current.children[parentPath[parentPath.length - 1]] as BookmarkFolder;
-        folder.children = newItems;
-      }
-      
-      addToHistory(updatedList.children);
-      updateList(updatedList);
-    }
+    // Prevent dropping a folder into itself or one of its descendants
+    if (activeItem.type === 'folder' && containsId(activeItem, overId)) return;
+
+    const children: BookmarkItem[] = JSON.parse(JSON.stringify(currentList.children));
+    const moved = removeById(children, activeId);
+    if (!moved) return;
+
+    const droppedOnFolder =
+      overItem.type === 'folder' && !(overItem as BookmarkFolder).collapsed;
+
+    const inserted = droppedOnFolder
+      ? insertIntoFolder(children, overId, moved)
+      : insertBeside(children, overId, moved);
+
+    if (!inserted) return;
+
+    const updatedList = { ...currentList, children };
+    addToHistory(children);
+    updateList(updatedList);
   };
 
   const SortableItem = ({ 
@@ -389,25 +450,16 @@ export const WysiwygEditor = () => {
           </div>
         </div>
         {!isCollapsed && folder.children.length > 0 && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={(event) => handleDragEnd(event, path)}
-          >
-            <SortableContext
-              items={folder.children.map(c => c.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {folder.children.map((child, idx) => (
-                <SortableItem
-                  key={child.id}
-                  item={child}
-                  path={[...path, idx]}
-                  depth={depth + 1}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+          <>
+            {folder.children.map((child, idx) => (
+              <SortableItem
+                key={child.id}
+                item={child}
+                path={[...path, idx]}
+                depth={depth + 1}
+              />
+            ))}
+          </>
         )}
       </div>
     );
@@ -556,10 +608,10 @@ export const WysiwygEditor = () => {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragEnd={(event) => handleDragEnd(event, [])}
+          onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={currentList.children.map(c => c.id)}
+            items={collectVisibleIds(currentList.children)}
             strategy={verticalListSortingStrategy}
           >
             {currentList.children.map((child, idx) => (

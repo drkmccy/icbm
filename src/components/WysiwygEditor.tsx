@@ -450,25 +450,16 @@ export const WysiwygEditor = () => {
           </div>
         </div>
         {!isCollapsed && folder.children.length > 0 && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={(event) => handleDragEnd(event, path)}
-          >
-            <SortableContext
-              items={folder.children.map(c => c.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              {folder.children.map((child, idx) => (
-                <SortableItem
-                  key={child.id}
-                  item={child}
-                  path={[...path, idx]}
-                  depth={depth + 1}
-                />
-              ))}
-            </SortableContext>
-          </DndContext>
+          <>
+            {folder.children.map((child, idx) => (
+              <SortableItem
+                key={child.id}
+                item={child}
+                path={[...path, idx]}
+                depth={depth + 1}
+              />
+            ))}
+          </>
         )}
       </div>
     );

@@ -576,11 +576,12 @@ export const WysiwygEditor = () => {
             }}
             className="flex-1 min-w-0 mr-4 text-lg font-semibold bg-transparent border-none focus:bg-background truncate"
           />
-          <div className="ml-auto flex gap-1 flex-shrink-0 w-[112px] justify-end">
+          <div className="ml-auto flex gap-1 flex-shrink-0 w-[132px] justify-end">
             <Button
               size="sm"
               variant="ghost"
               onClick={() => sortFolder([])}
+              className="h-8 w-8 p-0"
               title="Sort"
             >
               ↕️
@@ -589,6 +590,7 @@ export const WysiwygEditor = () => {
               size="sm"
               variant="ghost"
               onClick={() => addFolder()}
+              className="h-8 w-8 p-0"
               title="Add Subfolder"
             >
               📂
@@ -597,11 +599,13 @@ export const WysiwygEditor = () => {
               size="sm"
               variant="ghost"
               onClick={() => addLink()}
+              className="h-8 w-8 p-0"
               title="Add Link"
             >
               🔖
             </Button>
           </div>
+
         </div>
 
         {/* Children */}

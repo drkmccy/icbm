@@ -145,11 +145,13 @@ export const CodeEditor = () => {
         } else if (keyword !== undefined) {
           out += `<span class="syntax-purple">${escapeHtml(keyword)}</span>`;
         } else if (punct !== undefined) {
-          out += `<span class="syntax-pink">${escapeHtml(punct)}</span>`;
+          const cls = punct === '[' || punct === ']' ? 'syntax-yellow' : 'syntax-pink';
+          out += `<span class="${cls}">${escapeHtml(punct)}</span>`;
         }
       }
       out += escapeHtml(code.slice(lastIndex));
       return out;
+
     } else if (format === 'html') {
       // Highlight HTML: tags=pink, attributes=cyan, values=green
       highlighted = highlighted

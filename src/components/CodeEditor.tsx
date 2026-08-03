@@ -17,6 +17,7 @@ export const CodeEditor = () => {
   const { currentList, updateList, exportFormat, setExportFormat, addToHistory } = useBookmarks();
   const [code, setCode] = useState('');
   const [isValidCode, setIsValidCode] = useState(true);
+  const [errorLine, setErrorLine] = useState<number | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [scrollPos, setScrollPos] = useState({ left: 0, top: 0 });
   const handleEditorScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {

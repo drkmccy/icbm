@@ -231,11 +231,17 @@ export const CodeEditor = () => {
             className="text-sm font-mono w-max"
             style={{ transform: `translate(${-scrollPos.left}px, ${-scrollPos.top}px)` }}
           >
-            <code 
-              dangerouslySetInnerHTML={{ __html: highlightCode(code, exportFormat) }}
-              className={`block text-code-foreground whitespace-pre ${!isValidCode ? 'border-2 border-destructive' : ''}`}
-            />
+            <code className="block text-code-foreground whitespace-pre">
+              {highlightCode(code, exportFormat).split('\n').map((line, i) => (
+                <span
+                  key={i}
+                  dangerouslySetInnerHTML={{ __html: (line || ' ') + '\n' }}
+                  className={`block ${errorLine === i + 1 ? 'bg-destructive/20 ring-1 ring-destructive/50 rounded-sm' : ''}`}
+                />
+              ))}
+            </code>
           </pre>
+
         </div>
         
         {/* Editing layer - shows scrollbars */}

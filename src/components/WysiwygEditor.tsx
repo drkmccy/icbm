@@ -608,10 +608,10 @@ export const WysiwygEditor = () => {
         <DndContext
           sensors={sensors}
           collisionDetection={closestCenter}
-          onDragEnd={(event) => handleDragEnd(event, [])}
+          onDragEnd={handleDragEnd}
         >
           <SortableContext
-            items={currentList.children.map(c => c.id)}
+            items={collectVisibleIds(currentList.children)}
             strategy={verticalListSortingStrategy}
           >
             {currentList.children.map((child, idx) => (

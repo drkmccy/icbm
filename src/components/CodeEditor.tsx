@@ -42,11 +42,28 @@ export const CodeEditor = () => {
         }
         setCode(converted);
         setIsValidCode(true);
+        setErrorLine(null);
       } catch (error) {
         setIsValidCode(false);
       }
     }
   }, [currentList, exportFormat]);
+
+  // Best-effort mapping of a parse error to a 1-based line number
+  const getErrorLine = (source: string, error: unknown): number | null => {
+    const message = error instanceof Error ? error.message : String(error);
+
+    const lineMatch = message.match(/line (\d+)/i);
+    if (lineMatch) return parseInt(lineMatch[1], 10);
+
+    const posMatch = message.match(/position (\d+)/i);
+    if (posMatch) {
+      const pos = Math.min(parseInt(posMatch[1], 10), source.length);
+      return source.slice(0, pos).split('\n').length;
+    }
+
+    return null;
+  };
 
   const handleCodeChange = (newCode: string) => {
     setCode(newCode);
@@ -77,10 +94,13 @@ export const CodeEditor = () => {
         updateList(updated);
       }
       setIsValidCode(true);
+      setErrorLine(null);
     } catch (error) {
       setIsValidCode(false);
+      setErrorLine(getErrorLine(newCode, error));
     }
   };
+
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);

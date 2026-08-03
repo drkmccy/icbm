@@ -17,6 +17,7 @@ export const CodeEditor = () => {
   const { currentList, updateList, exportFormat, setExportFormat, addToHistory } = useBookmarks();
   const [code, setCode] = useState('');
   const [isValidCode, setIsValidCode] = useState(true);
+  const [errorLine, setErrorLine] = useState<number | null>(null);
   const textAreaRef = useRef<HTMLTextAreaElement>(null);
   const [scrollPos, setScrollPos] = useState({ left: 0, top: 0 });
   const handleEditorScroll = (e: React.UIEvent<HTMLTextAreaElement>) => {
@@ -41,11 +42,28 @@ export const CodeEditor = () => {
         }
         setCode(converted);
         setIsValidCode(true);
+        setErrorLine(null);
       } catch (error) {
         setIsValidCode(false);
       }
     }
   }, [currentList, exportFormat]);
+
+  // Best-effort mapping of a parse error to a 1-based line number
+  const getErrorLine = (source: string, error: unknown): number | null => {
+    const message = error instanceof Error ? error.message : String(error);
+
+    const lineMatch = message.match(/line (\d+)/i);
+    if (lineMatch) return parseInt(lineMatch[1], 10);
+
+    const posMatch = message.match(/position (\d+)/i);
+    if (posMatch) {
+      const pos = Math.min(parseInt(posMatch[1], 10), source.length);
+      return source.slice(0, pos).split('\n').length;
+    }
+
+    return null;
+  };
 
   const handleCodeChange = (newCode: string) => {
     setCode(newCode);
@@ -76,10 +94,13 @@ export const CodeEditor = () => {
         updateList(updated);
       }
       setIsValidCode(true);
+      setErrorLine(null);
     } catch (error) {
       setIsValidCode(false);
+      setErrorLine(getErrorLine(newCode, error));
     }
   };
+
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -145,11 +166,13 @@ export const CodeEditor = () => {
         } else if (keyword !== undefined) {
           out += `<span class="syntax-purple">${escapeHtml(keyword)}</span>`;
         } else if (punct !== undefined) {
-          out += `<span class="syntax-pink">${escapeHtml(punct)}</span>`;
+          const cls = punct === '[' || punct === ']' ? 'syntax-yellow' : 'syntax-pink';
+          out += `<span class="${cls}">${escapeHtml(punct)}</span>`;
         }
       }
       out += escapeHtml(code.slice(lastIndex));
       return out;
+
     } else if (format === 'html') {
       // Highlight HTML: tags=pink, attributes=cyan, values=green
       highlighted = highlighted
@@ -208,11 +231,17 @@ export const CodeEditor = () => {
             className="text-sm font-mono w-max"
             style={{ transform: `translate(${-scrollPos.left}px, ${-scrollPos.top}px)` }}
           >
-            <code 
-              dangerouslySetInnerHTML={{ __html: highlightCode(code, exportFormat) }}
-              className={`block text-code-foreground whitespace-pre ${!isValidCode ? 'border-2 border-destructive' : ''}`}
-            />
+            <code className="block text-code-foreground whitespace-pre">
+              {highlightCode(code, exportFormat).split('\n').map((line, i) => (
+                <span
+                  key={i}
+                  dangerouslySetInnerHTML={{ __html: (line || ' ') + '\n' }}
+                  className={`block ${errorLine === i + 1 ? 'bg-destructive/20 ring-1 ring-destructive/50 rounded-sm' : ''}`}
+                />
+              ))}
+            </code>
           </pre>
+
         </div>
         
         {/* Editing layer - shows scrollbars */}

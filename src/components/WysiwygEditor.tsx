@@ -5,34 +5,36 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { cn } from '@/lib/utils';
 import { v4 as uuidv4 } from 'uuid';
-import { ChevronRight, ChevronDown, Trash2, GripVertical } from 'lucide-react';
+import { ChevronRight, ChevronDown, Trash2, GripVertical, Folder, Bookmark } from 'lucide-react';
 import {
   DndContext,
-  closestCenter,
+  DragOverlay,
   KeyboardSensor,
   PointerSensor,
+  pointerWithin,
+  rectIntersection,
+  useDraggable,
+  useDroppable,
   useSensor,
   useSensors,
   DragEndEvent,
+  DragOverEvent,
+  DragStartEvent,
+  type CollisionDetection,
 } from '@dnd-kit/core';
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 
 export const WysiwygEditor = () => {
   const { currentList, updateList, addToHistory, undo, redo } = useBookmarks();
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [editingName, setEditingName] = useState(false);
   const [topName, setTopName] = useState(currentList?.topLevelName || "");
+  const [activeDragId, setActiveDragId] = useState<string | null>(null);
+  const [activeDropId, setActiveDropId] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -214,18 +216,6 @@ export const WysiwygEditor = () => {
   };
 
   // --- Tree helpers for cross-folder drag & drop ---
-  const collectVisibleIds = (items: BookmarkItem[]): string[] => {
-    const out: string[] = [];
-    const walk = (list: BookmarkItem[]) => {
-      list.forEach(item => {
-        out.push(item.id);
-        if (item.type === 'folder' && !item.collapsed) walk(item.children);
-      });
-    };
-    walk(items);
-    return out;
-  };
-
   const findItemById = (items: BookmarkItem[], id: string): BookmarkItem | null => {
     for (const item of items) {
       if (item.id === id) return item;
@@ -251,14 +241,19 @@ export const WysiwygEditor = () => {
     return null;
   };
 
-  const insertBeside = (items: BookmarkItem[], targetId: string, item: BookmarkItem): boolean => {
+  const insertBeside = (
+    items: BookmarkItem[],
+    targetId: string,
+    item: BookmarkItem,
+    position: 'before' | 'after'
+  ): boolean => {
     for (let i = 0; i < items.length; i++) {
       if (items[i].id === targetId) {
-        items.splice(i, 0, item);
+        items.splice(position === 'before' ? i : i + 1, 0, item);
         return true;
       }
       const child = items[i];
-      if (child.type === 'folder' && insertBeside(child.children, targetId, item)) return true;
+      if (child.type === 'folder' && insertBeside(child.children, targetId, item, position)) return true;
     }
     return false;
   };
@@ -283,30 +278,53 @@ export const WysiwygEditor = () => {
     return false;
   };
 
+  const collisionDetection: CollisionDetection = (args) => {
+    const pointerCollisions = pointerWithin(args);
+    return pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveDragId(String(event.active.id));
+  };
+
+  const handleDragOver = (event: DragOverEvent) => {
+    setActiveDropId(event.over ? String(event.over.id) : null);
+  };
+
+  const resetDragState = () => {
+    setActiveDragId(null);
+    setActiveDropId(null);
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (!over || active.id === over.id) return;
+    resetDragState();
+    if (!over) return;
 
     const activeId = String(active.id);
-    const overId = String(over.id);
+    const [position, overId] = String(over.id).split('::') as ['before' | 'inside' | 'after' | 'root', string?];
+    if (position !== 'root' && (!overId || activeId === overId)) return;
 
     const activeItem = findItemById(currentList.children, activeId);
-    const overItem = findItemById(currentList.children, overId);
-    if (!activeItem || !overItem) return;
+    const overItem = overId ? findItemById(currentList.children, overId) : null;
+    if (!activeItem || (position !== 'root' && !overItem)) return;
 
     // Prevent dropping a folder into itself or one of its descendants
-    if (activeItem.type === 'folder' && containsId(activeItem, overId)) return;
+    if (activeItem.type === 'folder' && overId && containsId(activeItem, overId)) return;
 
     const children: BookmarkItem[] = JSON.parse(JSON.stringify(currentList.children));
     const moved = removeById(children, activeId);
     if (!moved) return;
 
-    const droppedOnFolder =
-      overItem.type === 'folder' && !(overItem as BookmarkFolder).collapsed;
-
-    const inserted = droppedOnFolder
-      ? insertIntoFolder(children, overId, moved)
-      : insertBeside(children, overId, moved);
+    let inserted = false;
+    if (position === 'root') {
+      children.push(moved);
+      inserted = true;
+    } else if (position === 'inside' && overId) {
+      inserted = insertIntoFolder(children, overId, moved);
+    } else if (overId && (position === 'before' || position === 'after')) {
+      inserted = insertBeside(children, overId, moved, position);
+    }
 
     if (!inserted) return;
 
@@ -315,7 +333,7 @@ export const WysiwygEditor = () => {
     updateList(updatedList);
   };
 
-  const SortableItem = ({ 
+  const TreeItem = ({ 
     item, 
     path, 
     depth 
@@ -324,26 +342,49 @@ export const WysiwygEditor = () => {
     path: number[]; 
     depth: number;
   }) => {
-    const {
-      attributes,
-      listeners,
-      setNodeRef,
-      transform,
-      transition,
-    } = useSortable({ id: item.id });
-
-    const style = {
-      transform: CSS.Transform.toString(transform),
-      transition,
-    };
+    const { attributes, listeners, setNodeRef: setDraggableRef, isDragging } = useDraggable({ id: item.id });
+    const { setNodeRef: setBeforeRef } = useDroppable({ id: `before::${item.id}` });
+    const { setNodeRef: setInsideRef } = useDroppable({
+      id: `inside::${item.id}`,
+      disabled: item.type !== 'folder',
+    });
+    const { setNodeRef: setAfterRef } = useDroppable({ id: `after::${item.id}` });
+    const dragHandlers = { ...attributes, ...listeners };
 
     return (
-      <div ref={setNodeRef} style={style} {...attributes}>
-        {item.type === 'folder' ? (
-          <FolderRow folder={item as BookmarkFolder} path={path} depth={depth} dragHandlers={listeners} />
-        ) : (
-          <LinkRow link={item as BookmarkLink} path={path} depth={depth} dragHandlers={listeners} />
-        )}
+      <div ref={setDraggableRef} className={cn("relative", isDragging && "opacity-30")}>
+        <div
+          ref={setBeforeRef}
+          className={cn(
+            "h-1 rounded-full transition-colors",
+            activeDropId === `before::${item.id}` && "bg-accent"
+          )}
+          style={{ marginLeft: `${depth * 1.5 + 0.5}rem` }}
+        />
+        <div
+          ref={setInsideRef}
+          className={cn(
+            "rounded",
+            activeDropId === `inside::${item.id}` && "bg-accent/25 ring-1 ring-inset ring-accent"
+          )}
+        >
+          {item.type === 'folder' ? (
+            <FolderRow folder={item} path={path} depth={depth} dragHandlers={dragHandlers} />
+          ) : (
+            <LinkRow link={item} path={path} depth={depth} dragHandlers={dragHandlers} />
+          )}
+        </div>
+        {item.type === 'folder' && !item.collapsed && item.children.map((child, idx) => (
+          <TreeItem key={child.id} item={child} path={[...path, idx]} depth={depth + 1} />
+        ))}
+        <div
+          ref={setAfterRef}
+          className={cn(
+            "h-1 rounded-full transition-colors",
+            activeDropId === `after::${item.id}` && "bg-accent"
+          )}
+          style={{ marginLeft: `${depth * 1.5 + 0.5}rem` }}
+        />
       </div>
     );
   };

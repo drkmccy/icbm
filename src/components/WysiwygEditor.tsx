@@ -356,8 +356,9 @@ export const WysiwygEditor = () => {
         <div
           ref={setBeforeRef}
           className={cn(
-            "h-1 rounded-full transition-colors",
-            activeDropId === `before::${item.id}` && "bg-accent"
+            "pointer-events-none absolute inset-x-0 top-0 z-10 h-1/4",
+            activeDragId && "pointer-events-auto",
+            activeDropId === `before::${item.id}` && "border-t-2 border-accent"
           )}
           style={{ marginLeft: `${depth * 1.5 + 0.5}rem` }}
         />
@@ -374,17 +375,18 @@ export const WysiwygEditor = () => {
             <LinkRow link={item} path={path} depth={depth} dragHandlers={dragHandlers} />
           )}
         </div>
-        {item.type === 'folder' && !item.collapsed && item.children.map((child, idx) => (
-          <TreeItem key={child.id} item={child} path={[...path, idx]} depth={depth + 1} />
-        ))}
         <div
           ref={setAfterRef}
           className={cn(
-            "h-1 rounded-full transition-colors",
-            activeDropId === `after::${item.id}` && "bg-accent"
+            "pointer-events-none absolute inset-x-0 bottom-0 z-10 h-1/4",
+            activeDragId && "pointer-events-auto",
+            activeDropId === `after::${item.id}` && "border-b-2 border-accent"
           )}
           style={{ marginLeft: `${depth * 1.5 + 0.5}rem` }}
         />
+        {item.type === 'folder' && !item.collapsed && item.children.map((child, idx) => (
+          <TreeItem key={child.id} item={child} path={[...path, idx]} depth={depth + 1} />
+        ))}
       </div>
     );
   };

@@ -280,7 +280,16 @@ export const WysiwygEditor = () => {
 
   const collisionDetection: CollisionDetection = (args) => {
     const pointerCollisions = pointerWithin(args);
-    return pointerCollisions.length > 0 ? pointerCollisions : rectIntersection(args);
+    if (pointerCollisions.length > 0) {
+      return [...pointerCollisions].sort((a, b) => {
+        const aRect = args.droppableRects.get(a.id);
+        const bRect = args.droppableRects.get(b.id);
+        const aArea = aRect ? aRect.width * aRect.height : Number.MAX_SAFE_INTEGER;
+        const bArea = bRect ? bRect.width * bRect.height : Number.MAX_SAFE_INTEGER;
+        return aArea - bArea;
+      });
+    }
+    return rectIntersection(args);
   };
 
   const handleDragStart = (event: DragStartEvent) => {

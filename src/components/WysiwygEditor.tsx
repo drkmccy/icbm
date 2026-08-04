@@ -490,18 +490,6 @@ export const WysiwygEditor = () => {
             </div>
           </div>
         </div>
-        {!isCollapsed && folder.children.length > 0 && (
-          <>
-            {folder.children.map((child, idx) => (
-              <SortableItem
-                key={child.id}
-                item={child}
-                path={[...path, idx]}
-                depth={depth + 1}
-              />
-            ))}
-          </>
-        )}
       </div>
     );
   };
@@ -590,6 +578,20 @@ export const WysiwygEditor = () => {
     );
   };
 
+  const RootDropZone = () => {
+    const { setNodeRef } = useDroppable({ id: 'root::' });
+    return (
+      <div
+        ref={setNodeRef}
+        className={cn(
+          "mt-1 h-8 rounded border border-dashed border-transparent transition-colors",
+          activeDragId && "border-border",
+          activeDropId === 'root::' && "border-accent bg-accent/15"
+        )}
+      />
+    );
+  };
+
 
   return (
     <div className="h-full overflow-y-auto overflow-x-hidden bg-editor p-4">
@@ -652,22 +654,32 @@ export const WysiwygEditor = () => {
         {/* Children */}
         <DndContext
           sensors={sensors}
-          collisionDetection={closestCenter}
+          collisionDetection={collisionDetection}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
           onDragEnd={handleDragEnd}
+          onDragCancel={resetDragState}
         >
-          <SortableContext
-            items={collectVisibleIds(currentList.children)}
-            strategy={verticalListSortingStrategy}
-          >
-            {currentList.children.map((child, idx) => (
-              <SortableItem
-                key={child.id}
-                item={child}
-                path={[idx]}
-                depth={0}
-              />
-            ))}
-          </SortableContext>
+          {currentList.children.map((child, idx) => (
+            <TreeItem key={child.id} item={child} path={[idx]} depth={0} />
+          ))}
+          <RootDropZone />
+          <DragOverlay dropAnimation={null}>
+            {activeDragId && (() => {
+              const activeItem = findItemById(currentList.children, activeDragId);
+              if (!activeItem) return null;
+              return (
+                <div className="flex max-w-sm items-center gap-2 rounded border bg-card px-3 py-2 text-sm shadow-lg">
+                  {activeItem.type === 'folder' ? (
+                    <Folder className="h-4 w-4 text-muted-foreground" />
+                  ) : (
+                    <Bookmark className="h-4 w-4 text-muted-foreground" />
+                  )}
+                  <span className="truncate">{activeItem.name}</span>
+                </div>
+              );
+            })()}
+          </DragOverlay>
         </DndContext>
       </div>
     </div>

@@ -625,7 +625,16 @@ export const WysiwygEditor = () => {
         }
       }
 
-      dropStore.set(target);
+      // defer: collision detection runs during DndContext's render pass
+      if (target !== dropStore.get() && pendingDropRef.current !== target) {
+        pendingDropRef.current = target;
+        if (dropFrameRef.current === null) {
+          dropFrameRef.current = requestAnimationFrame(() => {
+            dropFrameRef.current = null;
+            dropStore.set(pendingDropRef.current);
+          });
+        }
+      }
       return collisions;
     },
     [dropStore]

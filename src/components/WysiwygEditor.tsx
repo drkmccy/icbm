@@ -652,6 +652,11 @@ export const WysiwygEditor = () => {
   );
 
   const resetDragState = useCallback(() => {
+    if (dropFrameRef.current !== null) {
+      cancelAnimationFrame(dropFrameRef.current);
+      dropFrameRef.current = null;
+    }
+    pendingDropRef.current = null;
     setActiveDragId(null);
     dragStore.set(null);
     dropStore.set(null);

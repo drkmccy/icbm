@@ -411,6 +411,8 @@ export const WysiwygEditor = () => {
   const inputRef = useRef<HTMLInputElement>(null);
 
   const dropStore = useRef(createStore<string | null>(null)).current;
+  const pendingDropRef = useRef<string | null>(null);
+  const dropFrameRef = useRef<number | null>(null);
   const dragStore = useRef(createStore<string | null>(null)).current;
 
   const listRef = useRef(currentList);

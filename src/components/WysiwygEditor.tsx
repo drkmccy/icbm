@@ -665,7 +665,7 @@ export const WysiwygEditor = () => {
   const handleDragEnd = useCallback(
     (event: DragEndEvent) => {
       const activeId = String(event.active.id);
-      const raw = dropStore.get();
+      const raw = pendingDropRef.current ?? dropStore.get();
       resetDragState();
       if (!raw) return;
 

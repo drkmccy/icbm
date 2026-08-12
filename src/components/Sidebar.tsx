@@ -29,16 +29,16 @@ export const Sidebar = ({ onOpenSettings, onOpenImport }: SidebarProps) => {
         <div className="space-y-1">
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent"
+            className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-accent hover:text-sidebar-foreground"
             onClick={createNewList}
           >
             <Plus className="h-4 w-4" />
             New List
           </Button>
-          
+
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent"
+            className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-accent hover:text-sidebar-foreground"
             onClick={onOpenImport}
           >
             <Upload className="h-4 w-4" />
@@ -101,7 +101,7 @@ export const Sidebar = ({ onOpenSettings, onOpenImport }: SidebarProps) => {
       <div className="p-2 space-y-1 border-t border-sidebar-border">
         <Button
           variant="ghost"
-          className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-sidebar-accent"
+          className="w-full justify-start gap-2 text-sidebar-foreground hover:bg-accent hover:text-sidebar-foreground"
           onClick={onOpenSettings}
         >
           <Settings className="h-4 w-4" />
